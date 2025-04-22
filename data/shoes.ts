@@ -1,4 +1,6 @@
-export const shoes = [
+import { Shoe } from "../types/shoe";
+
+export const shoes: Shoe[] = [
   {
     brand: "nike",
     stock: [
