@@ -1,4 +1,4 @@
-import { StyleSheet, Text } from "react-native";
+import { StyleProp, StyleSheet, Text, TextStyle } from "react-native";
 import React from "react";
 import { textSize } from "../../constants/textSize";
 import { colors } from "../../constants/colors";
@@ -6,11 +6,12 @@ import { colors } from "../../constants/colors";
 type TextBoldXLProps = {
   children: React.ReactNode;
   blue?: boolean;
+  style?: StyleProp<TextStyle>;
 }
 
-const TextBoldXL = ({ children, blue = false }: TextBoldXLProps) => {
+const TextBoldXL = ({ children, blue = false, style }: TextBoldXLProps) => {
   return (
-    <Text style={[styles.txt, { color: blue ? colors.BLUE : colors.DARK }]}>{children}</Text>
+    <Text style={[styles.txt, { color: blue ? colors.BLUE : colors.DARK }, style]}>{children}</Text>
   );
 };
 

@@ -14,7 +14,6 @@ export default function ListSection() {
 
 const styles = StyleSheet.create({
   container: {
-    borderWidth: 1,
     flex: 240,
     paddingVertical: spaces.L,
   },
