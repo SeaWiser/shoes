@@ -7,6 +7,7 @@ import TextMediumS from "../../../../ui-components/texts/TextMediumS";
 import TextBoldL from "../../../../ui-components/texts/TextBoldL";
 import TextMediumM from "../../../../ui-components/texts/TextMediumM";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { IS_LARGE_SCREEN, SCREEN_WIDTH } from "../../../../constants/sizes";
 
 type VerticalCardProps = {
   item: ShoeStock;
@@ -34,9 +35,8 @@ export default function VerticalCard({ item }: VerticalCardProps) {
 
 const styles = StyleSheet.create({
   container: {
-    width: 180,
+    width: IS_LARGE_SCREEN ? SCREEN_WIDTH / 3.5 : 180,
     height: "100%",
-    maxHeight: 300,
     backgroundColor: colors.WHITE,
     borderRadius: radius.REGULAR,
     padding: spaces.S,
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     ],
   },
   descriptionContainer: {
-    flex: 0.7,
+    flex: IS_LARGE_SCREEN ? 0.7 : 0.2,
     justifyContent: "space-between",
     padding: spaces.S,
   },
