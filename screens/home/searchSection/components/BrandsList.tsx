@@ -14,6 +14,7 @@ export default function BrandsList({ selectedBrand, setSelectedBrand }: BrandsLi
     <FlatList horizontal
               data={brands}
               style={styles.listContainer}
+              bounces={false}
               ItemSeparatorComponent={() => <ItemSeparator width={spaces.S} />}
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.contentStyle}

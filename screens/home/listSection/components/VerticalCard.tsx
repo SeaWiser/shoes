@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
   container: {
     width: 180,
     height: "100%",
+    maxHeight: 300,
     backgroundColor: colors.WHITE,
     borderRadius: radius.REGULAR,
     padding: spaces.S,

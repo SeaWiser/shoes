@@ -27,7 +27,9 @@ export default function SearchSection({
 const styles = StyleSheet.create({
   container: {
     flex: 120,
+    minHeight: 120,
     flexDirection: "column",
     justifyContent: "space-evenly",
+    alignItems: "center",
   },
 });
