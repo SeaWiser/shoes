@@ -3,11 +3,16 @@ import { spaces } from "../../../constants/spaces";
 import Banner from "../components/Banner";
 import ShoesList from "./components/ShoesList";
 
-export default function ListSection() {
+type ListSectionProps = {
+  selectedBrand: string;
+  inputValue: string;
+}
+
+export default function ListSection({ selectedBrand, inputValue }: ListSectionProps) {
   return (
     <View style={styles.container}>
       <Banner text="Shoes populaires" />
-      <ShoesList />
+      <ShoesList selectedBrand={selectedBrand} inputValue={inputValue} />
     </View>
   );
 }

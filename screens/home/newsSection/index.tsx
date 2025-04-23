@@ -4,8 +4,14 @@ import HorizontalCard from "./components/HorizontalCard";
 import { shoes } from "../../../data/shoes";
 import { spaces } from "../../../constants/spaces";
 
-export default function NewsSection() {
-  const item = shoes[0].stock.find((elem) => elem.new);
+type NewsSectionProps = {
+  selectedBrand: string;
+}
+
+export default function NewsSection({ selectedBrand }: NewsSectionProps) {
+  const item =
+    shoes.find(elem => elem.brand === selectedBrand)
+      ?.stock.find((elem) => elem.new);
 
   return (
     <View style={styles.container}>

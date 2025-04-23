@@ -1,13 +1,15 @@
 import { FlatList, StyleSheet } from "react-native";
 import { brands } from "../../../../data/brand";
 import BrandItem from "./BrandItem";
-import { useState } from "react";
 import ItemSeparator from "../../../../ui-components/separators/ListItemSeparator";
 import { spaces } from "../../../../constants/spaces";
 
-export default function BrandsList() {
-  const [selectedBrand, setSelectedBrand] = useState("nike");
+type BrandsListProps = {
+  selectedBrand: string;
+  setSelectedBrand: (name: string) => void;
+}
 
+export default function BrandsList({ selectedBrand, setSelectedBrand }: BrandsListProps) {
   return (
     <FlatList horizontal
               data={brands}
