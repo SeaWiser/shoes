@@ -7,6 +7,7 @@ import { radius } from "../../../../constants/radius";
 import { spaces } from "../../../../constants/spaces";
 import { ShoeStock } from "../../../../types/shoe";
 import { IS_LARGE_SCREEN } from "../../../../constants/sizes";
+import Touchable from "../../../../ui-components/touchable/Touchable";
 
 type HorizontalCardProps = {
   item: ShoeStock
@@ -15,7 +16,7 @@ type HorizontalCardProps = {
 export default function HorizontalCard({ item }: HorizontalCardProps) {
   const { height } = useWindowDimensions();
   const landscapeStyle: ImageStyle = {
-    width: "100%",
+    width: "95%",
     height: "100%",
     transform: [
       { rotate: "-20deg" },
@@ -27,16 +28,20 @@ export default function HorizontalCard({ item }: HorizontalCardProps) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.descriptionContainer}>
-        <View>
-          <TextMediumM blue>MEILLEUR CHOIX</TextMediumM>
-          <TextBoldXL>{item.name}</TextBoldXL>
+      <Touchable style={styles.touchableContainer}>
+        <View style={styles.touchableContainer}>
+          <View style={styles.descriptionContainer}>
+            <View>
+              <TextMediumM blue>MEILLEUR CHOIX</TextMediumM>
+              <TextBoldXL>{item.name}</TextBoldXL>
+            </View>
+            <TextBoldM>{item.price} €</TextBoldM>
+          </View>
+          <View style={styles.imageContainer}>
+            <Image source={item.items[0].image} style={height < 400 ? landscapeStyle : styles.image}></Image>
+          </View>
         </View>
-        <TextBoldM>{item.price} €</TextBoldM>
-      </View>
-      <View style={styles.imageContainer}>
-        <Image source={item.items[0].image} style={height < 400 ? landscapeStyle : styles.image}></Image>
-      </View>
+      </Touchable>
     </View>
   );
 }
@@ -49,6 +54,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     flexDirection: "row",
     marginHorizontal: spaces.L,
+    elevation: 4,
+    shadowColor: colors.DARK,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+  },
+  touchableContainer: {
+    height: "100%",
+    width: "100%",
+    flexDirection: "row",
   },
   descriptionContainer: {
     flex: 1,

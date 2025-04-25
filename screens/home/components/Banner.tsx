@@ -5,16 +5,14 @@ import TextMediumM from "../../../ui-components/texts/TextMediumM";
 
 type BannerProps = {
   text: string;
+  navigate: () => void;
 }
 
-export default function Banner({ text }: BannerProps) {
-  const onPress = () => {
-  };
-
+export default function Banner({ text, navigate }: BannerProps) {
   return (
     <View style={styles.container}>
-      <TextBoldL>{text}</TextBoldL>
-      <TouchableOpacity onPress={onPress}>
+      <TextBoldL style={{ flexShrink: 0 }}>{text}</TextBoldL>
+      <TouchableOpacity onPress={navigate}>
         <TextMediumM blue>Voir tout</TextMediumM>
       </TouchableOpacity>
     </View>

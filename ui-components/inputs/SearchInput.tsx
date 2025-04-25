@@ -1,10 +1,10 @@
-import { StyleSheet, TextInput, View } from "react-native";
+import { Platform, StyleSheet, TextInput, View } from "react-native";
 import { colors } from "../../constants/colors";
 import { spaces } from "../../constants/spaces";
 import { radius } from "../../constants/radius";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
 import { textSize } from "../../constants/textSize";
-import { ICON_SIZE } from "../../constants/sizes";
+import { ICON_SIZE, IS_SMALL_SCREEN } from "../../constants/sizes";
 
 type SearchInputProps = {
   placeholder?: string;
@@ -28,11 +28,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.WHITE,
     marginHorizontal: spaces.L,
     borderRadius: radius.FULL,
-    height: 50,
+    height: IS_SMALL_SCREEN ? 44 : 50,
     maxWidth: 360,
   },
   searchIcon: {
     marginHorizontal: spaces.M,
+    marginBottom: Platform.select({ android: spaces.XS, ios: 0 }),
   },
   input: {
     flex: 1,

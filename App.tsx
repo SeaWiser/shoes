@@ -1,6 +1,8 @@
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { NavigationContainer } from "@react-navigation/native";
+
+if (__DEV__) require("./ReactotronConfig");
 import { useFonts } from "expo-font";
-import HomeScreen from "./screens/home";
+import StackNavigator from "./navigators/StackNavigator";
 
 export default function App() {
   const fontLoaded = useFonts({
@@ -11,8 +13,8 @@ export default function App() {
   });
 
   return fontLoaded ? (
-    <SafeAreaProvider>
-      <HomeScreen />
-    </SafeAreaProvider>
+    <NavigationContainer>
+      <StackNavigator />
+    </NavigationContainer>
   ) : null;
 }

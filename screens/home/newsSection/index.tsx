@@ -4,12 +4,15 @@ import HorizontalCard from "./components/HorizontalCard";
 import { shoes } from "../../../data/shoes";
 import { spaces } from "../../../constants/spaces";
 import { IS_LARGE_SCREEN } from "../../../constants/sizes";
+import { useAppNavigation } from "../../../hooks/navigation/useAppNavigation";
 
 type NewsSectionProps = {
   selectedBrand: string;
 }
 
 export default function NewsSection({ selectedBrand }: NewsSectionProps) {
+  const navigation = useAppNavigation();
+
   const { height } = useWindowDimensions();
   const landscapeStyle = {
     flex: 160,
@@ -21,10 +24,14 @@ export default function NewsSection({ selectedBrand }: NewsSectionProps) {
     shoes.find(elem => elem.brand === selectedBrand)
       ?.stock.find((elem) => elem.new);
 
+  const navigateToNewsList = () => {
+    navigation.navigate("NewsList");
+  };
+
   return (
     <View style={height < 400 ? landscapeStyle : styles.container}>
-      <Banner text="Nouveautés" />
       <HorizontalCard item={item!} />
+      <Banner text="Nouveautés" navigate={navigateToNewsList} />
     </View>
   );
 }
@@ -32,6 +39,8 @@ export default function NewsSection({ selectedBrand }: NewsSectionProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 160,
+    flexDirection: "column-reverse",
     minHeight: IS_LARGE_SCREEN ? 320 : 160,
+    paddingVertical: spaces.M,
   },
 });
