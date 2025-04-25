@@ -1,10 +1,13 @@
 import { StyleSheet, useWindowDimensions, View } from "react-native";
+
+import { shoes } from "@data/shoes";
+import { spaces } from "@constants/spaces";
+import { IS_LARGE_SCREEN } from "@constants/sizes";
+import { useAppNavigation } from "@hooks/navigation/useAppNavigation";
+
 import Banner from "../components/Banner";
+
 import HorizontalCard from "./components/HorizontalCard";
-import { shoes } from "../../../data/shoes";
-import { spaces } from "../../../constants/spaces";
-import { IS_LARGE_SCREEN } from "../../../constants/sizes";
-import { useAppNavigation } from "../../../hooks/navigation/useAppNavigation";
 
 type NewsSectionProps = {
   selectedBrand: string;

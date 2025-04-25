@@ -1,10 +1,11 @@
 import { StyleSheet, View } from "react-native";
-import { spaces } from "../../../constants/spaces";
-import Banner from "../components/Banner";
-import ShoesList from "./components/ShoesList";
-import { IS_SMALL_SCREEN } from "../../../constants/sizes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../types/navigation";
+
+import { spaces } from "@constants/spaces";
+import { IS_SMALL_SCREEN } from "@constants/sizes";
+import Banner from "@screens/home/components/Banner";
+import ShoesList from "@screens/home/listSection/components/ShoesList";
+import { RootStackParamList } from "@models/navigation";
 
 type ListSectionProps = {
   selectedBrand: string;

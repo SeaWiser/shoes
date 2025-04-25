@@ -1,26 +1,28 @@
-import { ShoeStock } from "../../types/shoe";
 import { StyleSheet, View, Image } from "react-native";
-import { colors } from "../../constants/colors";
-import { radius } from "../../constants/radius";
-import { spaces } from "../../constants/spaces";
-import TextMediumS from "../texts/TextMediumS";
-import TextBoldL from "../texts/TextBoldL";
-import TextMediumM from "../texts/TextMediumM";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { IS_LARGE_SCREEN, SCREEN_WIDTH } from "../../constants/sizes";
-import Touchable from "../touchable/Touchable";
+import Touchable from "@ui-components/touchable/Touchable";
+import { ShoeStock } from "@models/shoe";
+import { colors } from "@constants/colors";
+import { radius } from "@constants/radius";
+import { spaces } from "@constants/spaces";
+import { IS_LARGE_SCREEN, SCREEN_WIDTH } from "@constants/sizes";
+import { useAppNavigation } from "@hooks/navigation/useAppNavigation";
+import TextMediumS from "@ui-components/texts/TextMediumS";
+import TextBoldL from "@ui-components/texts/TextBoldL";
+import TextMediumM from "@ui-components/texts/TextMediumM";
 
 type VerticalCardProps = {
   item: ShoeStock;
   listScreen?: boolean;
-}
+};
 
 export default function VerticalCard({ item, listScreen = false }: VerticalCardProps) {
-  const itemColors = item.items.map(elem => elem.color);
+  const navigation = useAppNavigation();
+  const itemColors = item.items.map((elem) => elem.color);
   console.log(itemColors);
   return (
     <View style={styles.container}>
-      <Touchable>
+      <Touchable onPress={() => navigation.navigate("Details")}>
         <View style={styles.touchableContainer}>
           <View style={styles.imageContainer}>
             <Image source={item.items[0].image} style={styles.image}></Image>
@@ -36,12 +38,14 @@ export default function VerticalCard({ item, listScreen = false }: VerticalCardP
                   <TextMediumM>{item.price} €</TextMediumM>
                 </View>
                 <View style={styles.colorsContainer}>
-                  {itemColors.map(color => (
+                  {itemColors.map((color) => (
                     <View key={color} style={[styles.colorItem, { backgroundColor: color }]} />
                   ))}
                 </View>
               </View>
-            ) : <TextMediumM>{item.price} €</TextMediumM>}
+            ) : (
+              <TextMediumM>{item.price} €</TextMediumM>
+            )}
           </View>
           {listScreen ? null : (
             <View style={styles.btn}>
@@ -83,11 +87,7 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
-    transform: [
-      { rotate: "-20deg" },
-      { translateX: -spaces.S },
-      { translateY: -spaces.S },
-    ],
+    transform: [{ rotate: "-20deg" }, { translateX: -spaces.S }, { translateY: -spaces.S }],
   },
   descriptionContainer: {
     justifyContent: "space-between",

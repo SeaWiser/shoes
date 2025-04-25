@@ -1,8 +1,9 @@
 import { NavigationContainer } from "@react-navigation/native";
+import { useFonts } from "expo-font";
+
+import StackNavigator from "./navigators/StackNavigator";
 
 if (__DEV__) require("./ReactotronConfig");
-import { useFonts } from "expo-font";
-import StackNavigator from "./navigators/StackNavigator";
 
 export default function App() {
   const fontLoaded = useFonts({

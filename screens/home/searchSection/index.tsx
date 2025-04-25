@@ -1,6 +1,7 @@
 import { StyleSheet, View } from "react-native";
-import SearchInput from "../../../ui-components/inputs/SearchInput";
-import BrandsList from "./components/BrandsList";
+
+import SearchInput from "@ui-components/inputs/SearchInput";
+import BrandsList from "@screens/home/searchSection/components/BrandsList";
 
 type SearchSectionProps = {
   inputValue: string;

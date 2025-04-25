@@ -1,13 +1,14 @@
 import { Image, ImageStyle, StyleSheet, useWindowDimensions, View } from "react-native";
-import TextMediumM from "../../../../ui-components/texts/TextMediumM";
-import { colors } from "../../../../constants/colors";
-import TextBoldXL from "../../../../ui-components/texts/TextBoldXL";
-import TextBoldM from "../../../../ui-components/texts/TextBoldM";
-import { radius } from "../../../../constants/radius";
-import { spaces } from "../../../../constants/spaces";
-import { ShoeStock } from "../../../../types/shoe";
-import { IS_LARGE_SCREEN } from "../../../../constants/sizes";
-import Touchable from "../../../../ui-components/touchable/Touchable";
+import Touchable from "@ui-components/touchable/Touchable";
+
+import { ShoeStock } from "@models/shoe";
+import { spaces } from "@constants/spaces";
+import TextMediumM from "@ui-components/texts/TextMediumM";
+import TextBoldXL from "@ui-components/texts/TextBoldXL";
+import TextBoldM from "@ui-components/texts/TextBoldM";
+import { IS_LARGE_SCREEN } from "@constants/sizes";
+import { colors } from "@constants/colors";
+import { radius } from "@constants/radius";
 
 type HorizontalCardProps = {
   item: ShoeStock

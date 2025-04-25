@@ -1,15 +1,16 @@
 import { View, StyleSheet, FlatList, ListRenderItem } from "react-native";
-import { colors } from "../../constants/colors";
-import { RootStackParamList } from "../../types/navigation";
-import { shoes } from "../../data/shoes";
-import { ShoeStock } from "../../types/shoe";
-import VerticalCard from "../../ui-components/cards/VerticalCard";
-import ListItemSeparator from "../../ui-components/separators/ListItemSeparator";
-import { spaces } from "../../constants/spaces";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RouteProp } from "@react-navigation/native";
 import { useEffect } from "react";
-import { SCREEN_HEIGHT } from "../../constants/sizes";
+
+import { colors } from "@constants/colors";
+import { RootStackParamList } from "@models/navigation";
+import { shoes } from "@data/shoes";
+import { ShoeStock } from "@models/shoe";
+import { spaces } from "@constants/spaces";
+import ListItemSeparator from "@ui-components/separators/ListItemSeparator";
+import { SCREEN_HEIGHT } from "@constants/sizes";
+import VerticalCard from "@ui-components/cards/VerticalCard";
 
 type ListRouteProp = RouteProp<RootStackParamList, any>;
 

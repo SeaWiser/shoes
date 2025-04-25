@@ -1,8 +1,9 @@
 import { FlatList, StyleSheet } from "react-native";
-import { brands } from "../../../../data/brand";
-import BrandItem from "./BrandItem";
-import ItemSeparator from "../../../../ui-components/separators/ListItemSeparator";
-import { spaces } from "../../../../constants/spaces";
+
+import { brands } from "@data/brand";
+import { spaces } from "@constants/spaces";
+import ItemSeparator from "@ui-components/separators/ListItemSeparator";
+import BrandItem from "@screens/home/searchSection/components/BrandItem";
 
 type BrandsListProps = {
   selectedBrand: string;

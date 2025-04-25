@@ -1,10 +1,11 @@
 import { Platform, StyleSheet, TextInput, View } from "react-native";
-import { colors } from "../../constants/colors";
-import { spaces } from "../../constants/spaces";
-import { radius } from "../../constants/radius";
 import EvilIcons from "@expo/vector-icons/EvilIcons";
-import { textSize } from "../../constants/textSize";
-import { ICON_SIZE, IS_SMALL_SCREEN } from "../../constants/sizes";
+
+import { colors } from "@constants/colors";
+import { spaces } from "@constants/spaces";
+import { radius } from "@constants/radius";
+import { textSize } from "@constants/textSize";
+import { ICON_SIZE, IS_SMALL_SCREEN } from "@constants/sizes";
 
 type SearchInputProps = {
   placeholder?: string;

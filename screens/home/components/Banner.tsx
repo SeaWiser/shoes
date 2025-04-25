@@ -1,7 +1,8 @@
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { spaces } from "../../../constants/spaces";
-import TextBoldL from "../../../ui-components/texts/TextBoldL";
-import TextMediumM from "../../../ui-components/texts/TextMediumM";
+
+import TextBoldL from "@ui-components/texts/TextBoldL";
+import TextMediumM from "@ui-components/texts/TextMediumM";
+import { spaces } from "@constants/spaces";
 
 type BannerProps = {
   text: string;

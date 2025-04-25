@@ -2,11 +2,17 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "moduleSuffixes": [
-      ".ios",
-      ".android",
-      ".native",
-      ""
-    ]
+    "moduleSuffixes": [".ios", ".android", ".native", ""],
+    "baseUrl": ".",
+    "paths": {
+      "@assets/*": ["assets/*"],
+      "@constants/*": ["constants/*"],
+      "@data/*": ["data/*"],
+      "@hooks/*": ["hooks/*"],
+      "@navigators/*": ["navigators/*"],
+      "@screens/*": ["screens/*"],
+      "@models/*": ["types/*"],
+      "@ui-components/*": ["ui-components/*"]
+    }
   }
 }

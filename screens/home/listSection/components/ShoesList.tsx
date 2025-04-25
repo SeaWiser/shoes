@@ -1,8 +1,9 @@
 import { FlatList, StyleSheet } from "react-native";
-import { shoes } from "../../../../data/shoes";
-import VerticalCard from "../../../../ui-components/cards/VerticalCard";
-import ItemSeparator from "../../../../ui-components/separators/ListItemSeparator";
-import { spaces } from "../../../../constants/spaces";
+
+import { shoes } from "@data/shoes";
+import VerticalCard from "@ui-components/cards/VerticalCard";
+import ItemSeparator from "@ui-components/separators/ListItemSeparator";
+import { spaces } from "@constants/spaces";
 
 type ShoesListProps = {
   selectedBrand: string;

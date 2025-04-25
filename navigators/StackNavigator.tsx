@@ -1,10 +1,12 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import HomeScreen from "../screens/home";
-import List from "../screens/list";
-import NewsList from "../screens/newsList";
-import { colors } from "../constants/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Pressable } from "react-native";
+
+import HomeScreen from "@screens/home";
+import List from "@screens/list";
+import NewsList from "@screens/newsList";
+import { colors } from "@constants/colors";
+import Details from "@screens/details";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +33,7 @@ export default function StackNavigator() {
       <Stack.Screen name="NewsList" component={NewsList} options={{
         title: "Nouveautés",
       }} />
+      <Stack.Screen name="Details" component={Details} />
     </Stack.Navigator>
   );
 }

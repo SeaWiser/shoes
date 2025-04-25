@@ -1,12 +1,13 @@
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { ScrollView, StatusBar, StyleSheet } from "react-native";
-import { colors } from "../../constants/colors";
-import SearchSection from "./searchSection";
-import ListSection from "./listSection";
-import NewsSection from "./newsSection";
+import { ScrollView, StatusBar, StyleSheet, View } from "react-native";
 import { useState } from "react";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../types/navigation";
+
+import { colors } from "@constants/colors";
+import { RootStackParamList } from "@models/navigation";
+import SearchSection from "@screens/home/searchSection";
+import ListSection from "@screens/home/listSection";
+import NewsSection from "@screens/home/newsSection";
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList>
@@ -29,7 +30,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           <ListSection selectedBrand={selectedBrand} inputValue={inputValue} navigation={navigation} />
           <NewsSection selectedBrand={selectedBrand} />
         </ScrollView>
-        {/*<View style={{ width: "100%", backgroundColor: "#000000", height: 106 }} />*/}
+        <View style={{ width: "100%", backgroundColor: "#000000", height: 106 }} />
       </SafeAreaView>
     </SafeAreaProvider>
   );

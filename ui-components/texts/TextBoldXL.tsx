@@ -1,7 +1,8 @@
 import { StyleProp, StyleSheet, Text, TextStyle } from "react-native";
 import React from "react";
-import { textSize } from "../../constants/textSize";
-import { colors } from "../../constants/colors";
+
+import { textSize } from "@constants/textSize";
+import { colors } from "@constants/colors";
 
 type TextBoldXLProps = {
   children: React.ReactNode;

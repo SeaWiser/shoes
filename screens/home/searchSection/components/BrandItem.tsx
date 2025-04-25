@@ -1,11 +1,12 @@
-import { Brand } from "../../../../types/brand";
 import { TouchableOpacity, View, StyleSheet, Image } from "react-native";
-import { colors } from "../../../../constants/colors";
-import { radius } from "../../../../constants/radius";
-import { spaces } from "../../../../constants/spaces";
-import { ICON_SIZE, IS_SMALL_SCREEN, SMALL_ICON_SIZE } from "../../../../constants/sizes";
-import TextBoldL from "../../../../ui-components/texts/TextBoldL";
-import { brands } from "../../../../data/brand";
+
+import { brands } from "@data/brand";
+import { spaces } from "@constants/spaces";
+import TextBoldL from "@ui-components/texts/TextBoldL";
+import { radius } from "@constants/radius";
+import { colors } from "@constants/colors";
+import { ICON_SIZE, IS_SMALL_SCREEN, SMALL_ICON_SIZE } from "@constants/sizes";
+import { Brand } from "@models/brand";
 
 type BrandItemProps = {
   item: Brand,
