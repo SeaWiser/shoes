@@ -18,11 +18,13 @@ export default function Gallery({ images, setSelectedImage, selectedImage }: Gal
       <View style={styles.imagesContainer}>
         {images.map((image, i) => (
           <View style={styles.imageContainer} key={i}>
-            <Touchable onPress={() => setSelectedImage(image)} color={colors.BLUE} useForeground={true}>
-              <View style={[styles.imageContainer, image === selectedImage ? styles.selectedImage : undefined]}>
-                <Image source={image} style={styles.image} />
-              </View>
-            </Touchable>
+            <View style={{ borderRadius: radius.REGULAR, overflow: "hidden" }}>
+              <Touchable onPress={() => setSelectedImage(image)} color={colors.BLUE} useForeground={true}>
+                <View style={[styles.imageContainer, image === selectedImage ? styles.selectedImage : undefined]}>
+                  <Image source={image} style={styles.image} />
+                </View>
+              </Touchable>
+            </View>
           </View>
         ))}
       </View>

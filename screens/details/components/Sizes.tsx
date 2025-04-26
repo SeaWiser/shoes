@@ -15,7 +15,6 @@ type SizesProps = {
 export default function Sizes({ sizes, selectedSize, setSelectedSize }: SizesProps) {
   const shoeSizes: ShoeSize[] = [37, 38, 39, 40, 41, 42, 43, 44, 45];
 
-  console.log(selectedSize);
   return (
     <View style={styles.container}>
       <TextBoldL style={styles.title}>Tailles</TextBoldL>

@@ -11,25 +11,21 @@ import { colors } from "@constants/colors";
 import { radius } from "@constants/radius";
 
 type HorizontalCardProps = {
-  item: ShoeStock
-}
+  item: ShoeStock;
+  onPress: () => void;
+};
 
-export default function HorizontalCard({ item }: HorizontalCardProps) {
+export default function HorizontalCard({ item, onPress }: HorizontalCardProps) {
   const { height } = useWindowDimensions();
   const landscapeStyle: ImageStyle = {
     width: "95%",
     height: "100%",
-    transform: [
-      { rotate: "-20deg" },
-      { translateX: -spaces.M },
-      { translateY: -spaces.L },
-      { scale: 0.8 },
-    ],
+    transform: [{ rotate: "-20deg" }, { translateX: -spaces.M }, { translateY: -spaces.L }, { scale: 0.8 }],
   };
 
   return (
     <View style={styles.container}>
-      <Touchable style={styles.touchableContainer}>
+      <Touchable style={styles.touchableContainer} onPress={onPress}>
         <View style={styles.touchableContainer}>
           <View style={styles.descriptionContainer}>
             <View>

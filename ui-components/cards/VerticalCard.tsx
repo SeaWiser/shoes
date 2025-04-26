@@ -6,7 +6,6 @@ import { colors } from "@constants/colors";
 import { radius } from "@constants/radius";
 import { spaces } from "@constants/spaces";
 import { IS_LARGE_SCREEN, SCREEN_WIDTH } from "@constants/sizes";
-import { useAppNavigation } from "@hooks/navigation/useAppNavigation";
 import TextMediumS from "@ui-components/texts/TextMediumS";
 import TextBoldL from "@ui-components/texts/TextBoldL";
 import TextMediumM from "@ui-components/texts/TextMediumM";
@@ -14,15 +13,15 @@ import TextMediumM from "@ui-components/texts/TextMediumM";
 type VerticalCardProps = {
   item: ShoeStock;
   listScreen?: boolean;
+  onPress?: () => void;
 };
 
-export default function VerticalCard({ item, listScreen = false }: VerticalCardProps) {
-  const navigation = useAppNavigation();
+export default function VerticalCard({ item, listScreen = false, onPress }: VerticalCardProps) {
   const itemColors = item.items.map((elem) => elem.color);
   console.log(itemColors);
   return (
     <View style={styles.container}>
-      <Touchable onPress={() => navigation.navigate("Details")}>
+      <Touchable onPress={onPress}>
         <View style={styles.touchableContainer}>
           <View style={styles.imageContainer}>
             <Image source={item.items[0].image} style={styles.image}></Image>

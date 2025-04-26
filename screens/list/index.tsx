@@ -14,14 +14,14 @@ import VerticalCard from "@ui-components/cards/VerticalCard";
 
 type ListRouteProp = RouteProp<RootStackParamList, any>;
 
-type ListeProps = {
+type ListProps = {
   route: ListRouteProp;
   navigation: NativeStackNavigationProp<RootStackParamList, "List">;
-}
+};
 
-export default function List({ route, navigation }: ListeProps) {
+export default function List({ route, navigation }: ListProps) {
   console.log(route.params);
-  const data = shoes.find(elem => elem.brand === route!.params!.brand);
+  const data = shoes.find((elem) => elem.brand === route!.params!.brand);
   console.log(data);
 
   useEffect(() => {
@@ -30,19 +30,22 @@ export default function List({ route, navigation }: ListeProps) {
     });
   }, [route.params?.brand]);
 
+  const navigateToDetails = (id: string) => navigation.navigate("Details", { id });
+
   const renderItem: ListRenderItem<ShoeStock> = ({ item }) => (
     <View style={styles.cardContainer}>
-      <VerticalCard item={item} listScreen></VerticalCard>
+      <VerticalCard item={item} listScreen onPress={() => navigateToDetails(item.id)}></VerticalCard>
     </View>
   );
   return (
     <View style={styles.container}>
-      <FlatList data={data?.stock ?? []}
-                keyExtractor={(item) => item.id}
-                renderItem={renderItem}
-                numColumns={2}
-                ItemSeparatorComponent={() => <ListItemSeparator height={spaces.L} />}
-                contentContainerStyle={styles.contentStyle}
+      <FlatList
+        data={data?.stock ?? []}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        numColumns={2}
+        ItemSeparatorComponent={() => <ListItemSeparator height={spaces.L} />}
+        contentContainerStyle={styles.contentStyle}
       />
     </View>
   );

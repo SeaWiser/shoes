@@ -11,7 +11,7 @@ import HorizontalCard from "./components/HorizontalCard";
 
 type NewsSectionProps = {
   selectedBrand: string;
-}
+};
 
 export default function NewsSection({ selectedBrand }: NewsSectionProps) {
   const navigation = useAppNavigation();
@@ -23,9 +23,9 @@ export default function NewsSection({ selectedBrand }: NewsSectionProps) {
     paddingVertical: spaces.M,
   };
 
-  const item =
-    shoes.find(elem => elem.brand === selectedBrand)
-      ?.stock.find((elem) => elem.new);
+  const item = shoes.find((elem) => elem.brand === selectedBrand)?.stock.find((elem) => elem.new);
+
+  const navigateToDetails = () => navigation.navigate("Details", { id: item!.id });
 
   const navigateToNewsList = () => {
     navigation.navigate("NewsList");
@@ -33,7 +33,7 @@ export default function NewsSection({ selectedBrand }: NewsSectionProps) {
 
   return (
     <View style={height < 400 ? landscapeStyle : styles.container}>
-      <HorizontalCard item={item!} />
+      <HorizontalCard item={item!} onPress={navigateToDetails} />
       <Banner text="Nouveautés" navigate={navigateToNewsList} />
     </View>
   );
