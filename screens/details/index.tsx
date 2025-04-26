@@ -8,21 +8,25 @@ import { ShoeSize } from "@models/shoe-size";
 import CustomButton from "@ui-components/buttons/CustomButton";
 import { spaces } from "@constants/spaces";
 import { SCREEN_HEIGHT } from "@constants/sizes";
+import { useState } from "react";
 
 export default function Details() {
+  console.log(SCREEN_HEIGHT);
   const data = shoes[0].stock[0];
   const imageSource = data.items[0].image;
   const images = data.items.map((item) => item.image);
   const sizes = data.items[0].sizes;
-  console.log(sizes);
+  const [selectedImage, setSelectedImage] = useState(data.items[0].image);
+  const [selectedSize, setSelectedSize] = useState<ShoeSize | undefined>();
+
   return (
     <View style={styles.mainContainer}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
-          <DetailsImage source={imageSource} />
+          <DetailsImage source={selectedImage} />
           <DetailsDescription name={data.name} price={data.price} description={data.description} />
-          <Gallery images={images} />
-          <Sizes sizes={sizes as ShoeSize[]} />
+          <Gallery images={images} setSelectedImage={setSelectedImage} selectedImage={selectedImage} />
+          <Sizes sizes={sizes as ShoeSize[]} selectedSize={selectedSize} setSelectedSize={setSelectedSize} />
           <View style={styles.btnContainer}>
             <CustomButton text="Ajouter au panier" onPress={() => console.log("Ajouter au panier")} />
           </View>

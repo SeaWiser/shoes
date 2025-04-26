@@ -1,4 +1,4 @@
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import TextBoldL from "@ui-components/texts/TextBoldL";
 import TextMediumM from "@ui-components/texts/TextMediumM";
 import { spaces } from "@constants/spaces";
@@ -8,28 +8,37 @@ import { ShoeSize } from "@models/shoe-size";
 
 type SizesProps = {
   sizes: ShoeSize[];
+  selectedSize: ShoeSize | undefined;
+  setSelectedSize: (size: ShoeSize) => void;
 };
 
-export default function Sizes({ sizes }: SizesProps) {
+export default function Sizes({ sizes, selectedSize, setSelectedSize }: SizesProps) {
+  const shoeSizes: ShoeSize[] = [37, 38, 39, 40, 41, 42, 43, 44, 45];
+
+  console.log(selectedSize);
   return (
     <View style={styles.container}>
       <TextBoldL style={styles.title}>Tailles</TextBoldL>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.contentContainer}>
-        {Array(9)
-          .fill(0)
-          .map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.sizeContainer,
-                sizes.includes((index + 37) as ShoeSize)
+        {shoeSizes.map((size) => (
+          <TouchableOpacity
+            onPress={() => setSelectedSize(size)}
+            activeOpacity={0.8}
+            key={size}
+            style={[
+              styles.sizeContainer,
+              selectedSize === size
+                ? styles.selectedSizeContainer
+                : sizes.includes(size)
                   ? styles.availableSizeContainer
                   : styles.unavailableSizeContainer,
-              ]}
-            >
-              <TextMediumM style={styles.sizeText}>{index + 37}</TextMediumM>
-            </View>
-          ))}
+            ]}
+          >
+            <TextMediumM style={[selectedSize === size ? styles.selectedSizeText : styles.sizeText]}>
+              {size}
+            </TextMediumM>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
     </View>
   );
@@ -56,6 +65,16 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
+    marginBottom: spaces.S,
+  },
+  selectedSizeContainer: {
+    backgroundColor: colors.BLUE,
+    borderColor: colors.BLUE,
+    elevation: 4,
+    shadowColor: colors.DARK,
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
   },
   availableSizeContainer: {
     backgroundColor: colors.LIGHT,
@@ -67,5 +86,8 @@ const styles = StyleSheet.create({
   },
   sizeText: {
     color: colors.DARK,
+  },
+  selectedSizeText: {
+    color: colors.WHITE,
   },
 });

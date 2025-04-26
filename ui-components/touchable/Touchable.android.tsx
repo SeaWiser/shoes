@@ -1,21 +1,30 @@
-import { StyleProp, TouchableNativeFeedback, ViewStyle } from "react-native";
+import { StyleProp, TouchableNativeFeedback, View, ViewStyle } from "react-native";
 import React from "react";
 
 import { colors } from "@constants/colors";
 
 type TouchableProps = {
-  styles: StyleProp<ViewStyle>,
-  children?: React.ReactNode,
-  onPress?: () => void,
-}
+  styles: StyleProp<ViewStyle>;
+  children?: React.ReactNode;
+  onPress?: () => void;
+  useForeground?: boolean;
+  color: string;
+};
 
-export default function Touchable({ styles, children, onPress }: TouchableProps) {
+export default function Touchable({
+  styles,
+  children,
+  onPress,
+  useForeground = false,
+  color = colors.LIGHT,
+}: TouchableProps) {
   return (
-    <TouchableNativeFeedback style={styles}
-                             background={TouchableNativeFeedback.Ripple(colors.LIGHT, true)}
-                             onPress={onPress}
+    <TouchableNativeFeedback
+      background={TouchableNativeFeedback.Ripple(color, true)}
+      onPress={onPress}
+      useForeground={useForeground}
     >
-      {children}
+      {useForeground ? <View style={[styles, { overflow: "hidden" }]}>{children}</View> : children}
     </TouchableNativeFeedback>
   );
 }
