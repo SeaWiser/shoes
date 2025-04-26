@@ -6,11 +6,10 @@ type TouchableProps = {
   style?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
   onPress?: () => void;
-  useForeground?: boolean;
   color?: string;
 };
 
-export default function Touchable({ style, children, onPress, useForeground, color = colors.LIGHT }: TouchableProps) {
+export default function Touchable({ style, children, onPress, color = colors.LIGHT }: TouchableProps) {
   return (
     <TouchableOpacity activeOpacity={0.7} style={style} onPress={onPress}>
       {children}
