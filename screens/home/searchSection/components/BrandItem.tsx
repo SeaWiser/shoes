@@ -1,5 +1,4 @@
 import { TouchableOpacity, View, StyleSheet, Image } from "react-native";
-
 import { brands } from "@data/brand";
 import { spaces } from "@constants/spaces";
 import TextBoldL from "@ui-components/texts/TextBoldL";
@@ -9,11 +8,11 @@ import { ICON_SIZE, IS_SMALL_SCREEN, SMALL_ICON_SIZE } from "@constants/sizes";
 import { Brand } from "@models/brand";
 
 type BrandItemProps = {
-  item: Brand,
-  selectedBrand: string,
-  setSelectedBrand: (brand: string) => void,
+  item: Brand;
+  selectedBrand: string;
+  setSelectedBrand: (brand: string) => void;
   index: number;
-}
+};
 
 export default function BrandItem({ item, selectedBrand, setSelectedBrand, index }: BrandItemProps) {
   const onPressBrand = () => {
@@ -21,10 +20,13 @@ export default function BrandItem({ item, selectedBrand, setSelectedBrand, index
   };
 
   return (
-    <TouchableOpacity onPress={onPressBrand} style={{
-      marginLeft: index === 0 ? spaces.L : 0,
-      marginRight: index === brands.length - 1 ? spaces.L : 0,
-    }}>
+    <TouchableOpacity
+      onPress={onPressBrand}
+      style={{
+        marginLeft: index === 0 ? spaces.L : 0,
+        marginRight: index === brands.length - 1 ? spaces.L : 0,
+      }}
+    >
       {item.name === selectedBrand ? (
         <View style={styles.selectedBrandContainer}>
           <View style={styles.iconContainer}>

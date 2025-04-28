@@ -1,6 +1,5 @@
 import { Image, ImageStyle, StyleSheet, useWindowDimensions, View } from "react-native";
 import Touchable from "@ui-components/touchable/Touchable";
-
 import { ShoeStock } from "@models/shoe";
 import { spaces } from "@constants/spaces";
 import TextMediumM from "@ui-components/texts/TextMediumM";

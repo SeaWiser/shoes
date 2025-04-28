@@ -1,6 +1,5 @@
 import { StyleProp, TouchableNativeFeedback, ViewStyle } from "react-native";
 import React from "react";
-
 import { colors } from "@constants/colors";
 
 type TouchableProps = {

@@ -2,6 +2,7 @@ import { Dimensions } from "react-native";
 
 export const ICON_SIZE = 32;
 export const SMALL_ICON_SIZE = 24;
+export const FOCUSED_ICON_SIZE = 28;
 
 const { width: WINDOW_WIDTH, height: WINDOW_HEIGHT } = Dimensions.get("window");
 

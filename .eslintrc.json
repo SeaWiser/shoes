@@ -25,13 +25,24 @@
       "warn",
       {
         "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
-        "newlines-between": "always"
+        "newlines-between": "ignore"
       }
     ]
   },
   "settings": {
     "import/resolver": {
-      "typescript": {}
+      "node": {
+        "paths": ["."],
+        "alias": {
+          "@ui-components": "./ui-components",
+          "@screens": "./screens",
+          "@constants": "./constants",
+          "@data": "./data",
+          "@hooks": "./hooks",
+          "@models": "./types",
+          "@navigators": "./navigators"
+        }
+      }
     }
   },
   "parser": "@typescript-eslint/parser",

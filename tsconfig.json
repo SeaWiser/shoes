@@ -12,7 +12,8 @@
       "@navigators/*": ["navigators/*"],
       "@screens/*": ["screens/*"],
       "@models/*": ["types/*"],
-      "@ui-components/*": ["ui-components/*"]
+      "@ui-components/*": ["ui-components/*"],
+      "@utils/*": ["utils/*"]
     }
   }
 }

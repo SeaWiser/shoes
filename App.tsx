@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-
-import StackNavigator from "./navigators/StackNavigator";
+import BottomTabsNavigator from "@navigators/BottomTabsNavigator";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 if (__DEV__) require("./ReactotronConfig");
 
@@ -14,8 +14,10 @@ export default function App() {
   });
 
   return fontLoaded ? (
-    <NavigationContainer>
-      <StackNavigator />
-    </NavigationContainer>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <BottomTabsNavigator />
+      </NavigationContainer>
+    </SafeAreaProvider>
   ) : null;
 }

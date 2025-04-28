@@ -1,5 +1,4 @@
 import { Image, ImageSourcePropType, Platform, StyleSheet, View } from "react-native";
-
 import { SCREEN_WIDTH } from "@constants/sizes";
 import { spaces } from "@constants/spaces";
 

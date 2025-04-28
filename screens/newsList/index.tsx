@@ -1,5 +1,4 @@
 import { View, StyleSheet, ListRenderItem, FlatList } from "react-native";
-
 import { colors } from "@constants/colors";
 import { shoes } from "@data/shoes";
 import { ShoeStock } from "@models/shoe";
