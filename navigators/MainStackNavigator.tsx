@@ -3,8 +3,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Pressable } from "react-native";
 import { colors } from "@constants/colors";
 import Details from "@screens/details";
-import BottomTabsNavigator from "@navigators/BottomTabsNavigator";
 import { MainStackParamList } from "@models/navigation";
+import DrawerNavigator from "@navigators/DrawerNavigator";
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
@@ -20,8 +20,8 @@ export default function MainStackNavigator() {
       })}
     >
       <Stack.Screen
-        name="BottomTabs"
-        component={BottomTabsNavigator}
+        name="Drawer"
+        component={DrawerNavigator}
         options={{
           headerShown: false,
         }}

@@ -8,24 +8,30 @@ import BrandItem from "@screens/home/searchSection/components/BrandItem";
 type BrandsListProps = {
   selectedBrand: string;
   setSelectedBrand: (name: string) => void;
-}
+};
 
-export default function BrandsList({ selectedBrand, setSelectedBrand }: BrandsListProps) {
+export default function BrandsList({
+  selectedBrand,
+  setSelectedBrand,
+}: BrandsListProps) {
   return (
-    <FlatList horizontal
-              data={brands}
-              style={styles.listContainer}
-              bounces={false}
-              ItemSeparatorComponent={() => <ItemSeparator width={spaces.S} />}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.contentStyle}
-              keyExtractor={(item) => item.name}
-              renderItem={({ item, index }) =>
-                <BrandItem item={item}
-                           selectedBrand={selectedBrand}
-                           setSelectedBrand={setSelectedBrand}
-                           index={index}
-                />}
+    <FlatList
+      horizontal
+      data={brands}
+      style={styles.listContainer}
+      bounces={false}
+      ItemSeparatorComponent={() => <ItemSeparator width={spaces.M} />}
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.contentStyle}
+      keyExtractor={(item) => item.name}
+      renderItem={({ item, index }) => (
+        <BrandItem
+          item={item}
+          selectedBrand={selectedBrand}
+          setSelectedBrand={setSelectedBrand}
+          index={index}
+        />
+      )}
     />
   );
 }

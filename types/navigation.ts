@@ -14,4 +14,5 @@ export type MainStackParamList = {
   Details: {
     id: string;
   };
+  Drawer: undefined;
 };

@@ -11,13 +11,27 @@ type SearchInputProps = {
   placeholder?: string;
   value: string;
   onChangeText: (value: string) => void;
-}
+};
 
-export default function SearchInput({ placeholder, value, onChangeText }: SearchInputProps) {
+export default function SearchInput({
+  placeholder,
+  value,
+  onChangeText,
+}: SearchInputProps) {
   return (
     <View style={styles.inputContainer}>
-      <EvilIcons name="search" size={ICON_SIZE} color={colors.GREY} style={styles.searchIcon} />
-      <TextInput placeholder={placeholder} value={value} onChangeText={onChangeText} style={styles.input}></TextInput>
+      <EvilIcons
+        name="search"
+        size={ICON_SIZE}
+        color={colors.GREY}
+        style={styles.searchIcon}
+      />
+      <TextInput
+        placeholder={placeholder}
+        value={value}
+        onChangeText={onChangeText}
+        style={styles.input}
+      ></TextInput>
     </View>
   );
 }
@@ -30,7 +44,7 @@ const styles = StyleSheet.create({
     marginHorizontal: spaces.L,
     borderRadius: radius.FULL,
     height: IS_SMALL_SCREEN ? 44 : 50,
-    maxWidth: 360,
+    maxWidth: 460,
   },
   searchIcon: {
     marginHorizontal: spaces.M,
