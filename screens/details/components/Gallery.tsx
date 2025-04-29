@@ -11,7 +11,11 @@ type GalleryProps = {
   selectedImage: ImageSourcePropType;
 };
 
-export default function Gallery({ images, setSelectedImage, selectedImage }: GalleryProps) {
+export default function Gallery({
+  images,
+  setSelectedImage,
+  selectedImage,
+}: GalleryProps) {
   return (
     <View style={styles.galleryContainer}>
       <TextBoldL>Galerie</TextBoldL>
@@ -19,8 +23,16 @@ export default function Gallery({ images, setSelectedImage, selectedImage }: Gal
         {images.map((image, i) => (
           <View style={styles.imageContainer} key={i}>
             <View style={{ borderRadius: radius.REGULAR, overflow: "hidden" }}>
-              <Touchable onPress={() => setSelectedImage(image)} color={colors.BLUE} useForeground={true}>
-                <View style={[styles.imageContainer, image === selectedImage ? styles.selectedImage : undefined]}>
+              <Touchable
+                onPress={() => setSelectedImage(image)}
+                color={colors.BLUE}
+              >
+                <View
+                  style={[
+                    styles.imageContainer,
+                    image === selectedImage ? styles.selectedImage : undefined,
+                  ]}
+                >
                   <Image source={image} style={styles.image} />
                 </View>
               </Touchable>
@@ -55,6 +67,10 @@ const styles = StyleSheet.create({
   image: {
     width: 90,
     height: 90,
-    transform: [{ rotate: "-20deg" }, { translateX: -spaces.S }, { translateY: -spaces.S }],
+    transform: [
+      { rotate: "-20deg" },
+      { translateX: -spaces.S },
+      { translateY: -spaces.S },
+    ],
   },
 });

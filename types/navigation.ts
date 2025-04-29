@@ -4,5 +4,14 @@ export type RootStackParamList = {
     brand: string;
   };
   NewsList: undefined;
-  Details: { id: string };
+  Details: {
+    id: string;
+  };
+};
+
+export type MainStackParamList = {
+  BottomTabs: undefined;
+  Details: {
+    id: string;
+  };
 };

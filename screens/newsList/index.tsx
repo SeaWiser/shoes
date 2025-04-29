@@ -3,7 +3,7 @@ import { colors } from "@constants/colors";
 import { shoes } from "@data/shoes";
 import { ShoeStock } from "@models/shoe";
 import { spaces } from "@constants/spaces";
-import { SCREEN_HEIGHT } from "@constants/sizes";
+import { IS_LARGE_SCREEN, SCREEN_HEIGHT } from "@constants/sizes";
 import ListItemSeparator from "@ui-components/separators/ListItemSeparator";
 import VerticalCard from "@ui-components/cards/VerticalCard";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -18,11 +18,16 @@ export default function NewsList({ navigation }: NewsListProps) {
     .map((brand) => brand.stock.find((item) => item.new))
     .filter((item): item is ShoeStock => item !== undefined);
 
-  const navigateToDetails = (id: string) => navigation.navigate("Details", { id });
+  const navigateToDetails = (id: string) =>
+    navigation.navigate("Details", { id });
 
   const renderItem: ListRenderItem<ShoeStock> = ({ item }) => (
     <View style={styles.cardContainer}>
-      <VerticalCard item={item} listScreen onPress={() => navigateToDetails(item.id)}></VerticalCard>
+      <VerticalCard
+        item={item}
+        listScreen
+        onPress={() => navigateToDetails(item.id)}
+      ></VerticalCard>
     </View>
   );
   return (
@@ -47,7 +52,7 @@ const styles = StyleSheet.create({
     paddingBottom: 106,
   },
   contentStyle: {
-    paddingBottom: spaces.XL,
+    paddingBottom: spaces.XL + (IS_LARGE_SCREEN ? 212 : 106),
   },
   cardContainer: {
     flex: 0.5,

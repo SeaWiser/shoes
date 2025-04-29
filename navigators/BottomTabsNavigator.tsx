@@ -1,6 +1,6 @@
 import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import StackNavigator from "@navigators/StackNavigator";
+import HomeStackNavigator from "@navigators/HomeStackNavigator";
 import Favorites from "@screens/favorites";
 import Cart from "@screens/cart";
 import Notifications from "@screens/notifications";
@@ -68,7 +68,7 @@ export default function BottomTabsNavigator() {
     >
       <Tabs.Screen
         name="HomeStack"
-        component={StackNavigator}
+        component={HomeStackNavigator}
         options={{
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
@@ -119,7 +119,6 @@ export default function BottomTabsNavigator() {
         name="Notifications"
         component={Notifications}
         options={{
-          headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <NotificationsIcon
               width={focused ? FOCUSED_ICON_SIZE : SMALL_ICON_SIZE}
