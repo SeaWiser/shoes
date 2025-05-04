@@ -8,12 +8,28 @@ import { ICON_SIZE } from "@constants/sizes";
 import { colors } from "@constants/colors";
 import { spaces } from "@constants/spaces";
 import { radius } from "@constants/radius";
+import { useDispatch } from "react-redux";
+import {
+  decreaseQuantity,
+  increaseQuantity,
+  removeShoesFromCart,
+} from "../../../store/slices/cartSlice";
 
 type ListItemProps = {
   item: CartShoe;
 };
 
 export default function ListItem({ item }: ListItemProps) {
+  const dispatch = useDispatch();
+
+  const decreaseShoesQuantity = () =>
+    dispatch(decreaseQuantity({ id: item.id }));
+
+  const increaseShoesQuantity = () =>
+    dispatch(increaseQuantity({ id: item.id }));
+
+  const removeShoes = () => dispatch(removeShoesFromCart({ id: item.id }));
+
   return (
     <View style={styles.container}>
       <View style={styles.leftContainer}>
@@ -29,12 +45,14 @@ export default function ListItem({ item }: ListItemProps) {
                 styles.operationSignContainer,
                 styles.subtractSignContainer,
               ]}
+              onPress={decreaseShoesQuantity}
             >
               <TextBoldXL style={styles.minusText}>-</TextBoldXL>
             </Pressable>
             <TextBoldM style={styles.quantityText}>{item.quantity}</TextBoldM>
             <Pressable
               style={[styles.operationSignContainer, styles.addSignContainer]}
+              onPress={increaseShoesQuantity}
             >
               <TextBoldXL style={styles.plusText}>+</TextBoldXL>
             </Pressable>
@@ -49,6 +67,7 @@ export default function ListItem({ item }: ListItemProps) {
           size={ICON_SIZE}
           color={colors.GREY}
           suppressHighlighting={true}
+          onPress={removeShoes}
         />
       </View>
     </View>
