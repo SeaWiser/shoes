@@ -1,4 +1,4 @@
-import { Shoe } from "../types/shoe";
+import { Shoe } from "@models/shoe";
 
 export const shoes: Shoe[] = [
   {

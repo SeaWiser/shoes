@@ -12,6 +12,8 @@ import { useEffect, useState } from "react";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "@models/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useDispatch } from "react-redux";
+import { addShoesToCart } from "../../store/slices/cartSlice";
 
 type DetailsProps = {
   route: RouteProp<RootStackParamList, "Details">;
@@ -19,17 +21,41 @@ type DetailsProps = {
 };
 
 export default function Details({ route, navigation }: DetailsProps) {
+  const dispatch = useDispatch();
   const data = shoes
     .find((el) => el.stock.find((item) => item.id === route.params.id))!
     .stock.find((item) => item.id === route.params.id)!;
+
+  const brand = shoes.find((el) =>
+    el.stock.find((item) => item.id === route.params.id),
+  )?.brand;
+
   const images = data.items.map((item) => item.image);
   const [selectedImage, setSelectedImage] = useState(data.items[0].image);
   const [selectedSize, setSelectedSize] = useState<ShoeSize | undefined>();
   const [sizes, setSizes] = useState<number[] | undefined>(data.items[0].sizes);
 
+  const addToCart = () => {
+    dispatch(
+      addShoesToCart({
+        id: data.id + Date.now(),
+        name:
+          (brand ? brand.charAt(0).toUpperCase() + brand.slice(1) : "") +
+          " " +
+          data.name,
+        image: selectedImage,
+        size: selectedSize,
+        price: data.price,
+        quantity: 1,
+      }),
+    );
+  };
+
   useEffect(() => {
     setSizes(data.items.find((el) => el.image === selectedImage)?.sizes);
-    setSelectedSize(undefined);
+    setSelectedSize(
+      data.items.find((el) => el.image === selectedImage)?.sizes[0] as ShoeSize,
+    );
   }, [selectedImage]);
 
   useEffect(() => {
@@ -60,10 +86,7 @@ export default function Details({ route, navigation }: DetailsProps) {
             setSelectedSize={setSelectedSize}
           />
           <View style={styles.btnContainer}>
-            <CustomButton
-              text="Ajouter au panier"
-              onPress={() => console.log("Ajouter au panier")}
-            />
+            <CustomButton text="Ajouter au panier" onPress={addToCart} />
           </View>
         </View>
       </ScrollView>
