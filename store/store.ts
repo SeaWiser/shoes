@@ -1,11 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import reactotron from "../ReactotronConfig";
 import favoritesReducer from "./slices/favoritesSlice";
+import notificationsReducer from "./slices/notificationsSlice";
 
 export const store = configureStore({
   reducer: {
     favorites: favoritesReducer,
+    notifications: notificationsReducer,
   },
+
   enhancers: (getDefaultEnhancer) =>
     getDefaultEnhancer().concat(reactotron.createEnhancer()),
 });
