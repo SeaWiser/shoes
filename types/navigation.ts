@@ -15,4 +15,5 @@ export type MainStackParamList = {
     id: string;
   };
   Drawer: undefined;
+  MainCart: undefined;
 };

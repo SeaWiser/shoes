@@ -4,7 +4,7 @@ import {
   DrawerContentScrollView,
   DrawerItem,
 } from "@react-navigation/drawer";
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, Text } from "react-native";
 import BottomTabsNavigator from "@navigators/BottomTabsNavigator";
 import TextBoldXL from "@ui-components/texts/TextBoldXL";
 import { spaces } from "@constants/spaces";
@@ -17,14 +17,22 @@ import ProfileIcon from "@assets/images/navigation/user.svg";
 import FavoriteIcon from "@assets/images/navigation/favorite.svg";
 import CartIcon from "@assets/images/navigation/cart.svg";
 import NotificationsIcon from "@assets/images/navigation/notifications.svg";
-import { useIsFocused } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+
+type LabelProps = {
+  shoesInCartCount: number;
+  label: string;
+  activeIndex: number;
+  index: number;
+};
 
 const Drawer = createDrawerNavigator();
 
 const routes = [
   { name: "HomeStack", label: "Accueil", icon: HomeIcon, index: 0 },
   { name: "Favorites", label: "Favoris", icon: FavoriteIcon, index: 1 },
-  { name: "Cart", label: "Panier", icon: CartIcon, index: 2 },
+  { name: "MainCart", label: "Panier", icon: CartIcon, index: 2 },
   {
     name: "Notifications",
     label: "Notifications",
@@ -52,15 +60,31 @@ export default function DrawerNavigator() {
   );
 }
 
+const Label = ({ shoesInCartCount, label, activeIndex, index }: LabelProps) => {
+  return shoesInCartCount && label === "Panier" ? (
+    <View style={styles.cartView}>
+      <Text style={[styles.label, { color: colors.BLUE }]}>{label}</Text>
+      <View style={styles.activeCartContainer}>
+        <Text style={{ color: colors.WHITE }}>{shoesInCartCount}</Text>
+      </View>
+    </View>
+  ) : (
+    <Text
+      style={[
+        styles.label,
+        { color: activeIndex === index ? colors.WHITE : colors.GREY },
+      ]}
+    >
+      {label}
+    </Text>
+  );
+};
+
 function CustomDrawerContent(props: DrawerContentComponentProps) {
-  const isFocused = useIsFocused();
-
-  if (!isFocused) {
-    return null; // rien à afficher tant que Drawer pas visible
-  }
-
   const activeIndex = props.state.routes[0].state?.index || 0;
-  console.log(activeIndex);
+  const shoesInCartCount = useSelector(
+    (state: RootState) => state.cart.shoes.length,
+  );
 
   return (
     <DrawerContentScrollView>
@@ -75,17 +99,34 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       {routes.map((route) => (
         <DrawerItem
           key={route.index}
-          label={route.label}
+          label={() => (
+            <Label
+              shoesInCartCount={shoesInCartCount}
+              label={route.label}
+              activeIndex={activeIndex}
+              index={route.index}
+            />
+          )}
           icon={() => (
             <route.icon
               width={SMALL_ICON_SIZE}
               height={SMALL_ICON_SIZE}
-              color={activeIndex === route.index ? colors.WHITE : colors.GREY}
+              color={
+                shoesInCartCount && route.label === "Panier"
+                  ? colors.BLUE
+                  : activeIndex === route.index
+                    ? colors.WHITE
+                    : colors.GREY
+              }
             />
           )}
-          onPress={() =>
-            props.navigation.navigate("BottomTabs", { screen: route.name })
-          }
+          onPress={() => {
+            if (route.name === "MainCart") {
+              props.navigation.navigate(route.name);
+            } else {
+              props.navigation.navigate("BottomTabs", { screen: route.name });
+            }
+          }}
           labelStyle={[
             styles.label,
             { color: activeIndex === route.index ? colors.WHITE : colors.GREY },
@@ -132,5 +173,17 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 18,
     fontFamily: "Medium",
+  },
+  cartView: {
+    flexDirection: "row",
+  },
+  activeCartContainer: {
+    marginLeft: spaces.M,
+    width: SMALL_ICON_SIZE,
+    height: SMALL_ICON_SIZE,
+    backgroundColor: colors.BLUE,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: radius.FULL,
   },
 });
