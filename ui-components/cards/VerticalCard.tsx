@@ -5,28 +5,52 @@ import { ShoeStock } from "@models/shoe";
 import { colors } from "@constants/colors";
 import { radius } from "@constants/radius";
 import { spaces } from "@constants/spaces";
-import { IS_LARGE_SCREEN, SCREEN_WIDTH } from "@constants/sizes";
+import {
+  IS_LARGE_SCREEN,
+  SCREEN_WIDTH,
+  SMALL_ICON_SIZE,
+} from "@constants/sizes";
 import TextMediumS from "@ui-components/texts/TextMediumS";
 import TextBoldL from "@ui-components/texts/TextBoldL";
 import TextMediumM from "@ui-components/texts/TextMediumM";
+import { colors as iconColors } from "@constants/colors";
 
 type VerticalCardProps = {
   item: ShoeStock;
   listScreen?: boolean;
   onPress?: () => void;
+  isFavorite?: boolean;
 };
 
-export default function VerticalCard({ item, listScreen = false, onPress }: VerticalCardProps) {
+export default function VerticalCard({
+  item,
+  listScreen = false,
+  onPress,
+  isFavorite = false,
+}: VerticalCardProps) {
   const itemColors = item.items.map((elem) => elem.color);
   console.log(itemColors);
   return (
     <View style={styles.container}>
       <Touchable onPress={onPress}>
         <View style={styles.touchableContainer}>
+          {isFavorite ? (
+            <AntDesign
+              name="star"
+              size={SMALL_ICON_SIZE}
+              color={iconColors.BLUE}
+              style={styles.favoritesIcon}
+            />
+          ) : null}
           <View style={styles.imageContainer}>
             <Image source={item.items[0].image} style={styles.image}></Image>
           </View>
-          <View style={[styles.descriptionContainer, { flex: listScreen ? 1 : IS_LARGE_SCREEN ? 0.7 : 0.2 }]}>
+          <View
+            style={[
+              styles.descriptionContainer,
+              { flex: listScreen ? 1 : IS_LARGE_SCREEN ? 0.7 : 0.2 },
+            ]}
+          >
             <View>
               <TextMediumS blue>TOP VENTE</TextMediumS>
               <TextBoldL style={styles.itemName}>{item.name}</TextBoldL>
@@ -38,7 +62,10 @@ export default function VerticalCard({ item, listScreen = false, onPress }: Vert
                 </View>
                 <View style={styles.colorsContainer}>
                   {itemColors.map((color) => (
-                    <View key={color} style={[styles.colorItem, { backgroundColor: color }]} />
+                    <View
+                      key={color}
+                      style={[styles.colorItem, { backgroundColor: color }]}
+                    />
                   ))}
                 </View>
               </View>
@@ -78,6 +105,11 @@ const styles = StyleSheet.create({
     padding: spaces.S,
     paddingVertical: 2,
   },
+  favoritesIcon: {
+    position: "absolute",
+    top: spaces.M,
+    left: spaces.M,
+  },
   imageContainer: {
     flex: 2,
     justifyContent: "center",
@@ -86,7 +118,11 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
-    transform: [{ rotate: "-20deg" }, { translateX: -spaces.S }, { translateY: -spaces.S }],
+    transform: [
+      { rotate: "-20deg" },
+      { translateX: -spaces.S },
+      { translateY: -spaces.S },
+    ],
   },
   descriptionContainer: {
     justifyContent: "space-between",

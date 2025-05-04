@@ -33,7 +33,9 @@ export default function Details({ route, navigation }: DetailsProps) {
   }, [selectedImage]);
 
   useEffect(() => {
-    navigation.setOptions({ title: data.gender === "m" ? "Shoes Homme" : "Shoes Femme" });
+    navigation.setOptions({
+      title: data.gender === "m" ? "Shoes Homme" : "Shoes Femme",
+    });
   }, [route.params.id]);
 
   return (
@@ -41,11 +43,27 @@ export default function Details({ route, navigation }: DetailsProps) {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.container}>
           <DetailsImage source={selectedImage} />
-          <DetailsDescription name={data.name} price={data.price} description={data.description} />
-          <Gallery images={images} setSelectedImage={setSelectedImage} selectedImage={selectedImage} />
-          <Sizes sizes={sizes as ShoeSize[]} selectedSize={selectedSize} setSelectedSize={setSelectedSize} />
+          <DetailsDescription
+            name={data.name}
+            price={data.price}
+            description={data.description}
+            id={route.params.id}
+          />
+          <Gallery
+            images={images}
+            setSelectedImage={setSelectedImage}
+            selectedImage={selectedImage}
+          />
+          <Sizes
+            sizes={sizes as ShoeSize[]}
+            selectedSize={selectedSize}
+            setSelectedSize={setSelectedSize}
+          />
           <View style={styles.btnContainer}>
-            <CustomButton text="Ajouter au panier" onPress={() => console.log("Ajouter au panier")} />
+            <CustomButton
+              text="Ajouter au panier"
+              onPress={() => console.log("Ajouter au panier")}
+            />
           </View>
         </View>
       </ScrollView>
