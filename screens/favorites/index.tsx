@@ -27,11 +27,11 @@ export default function Favorites({ navigation }: ListProps) {
   // );
   const { data: favoriteShoes, isLoading } = useGetAllFavoritesQuery();
 
-  const data = favoriteShoes
-    ?.map((favorite) =>
+  const data = favoriteShoes?.shoesIds
+    ?.map((id) =>
       shoes
-        .find((item) => item.stock.find((elem) => elem.id === favorite.shoesId))
-        ?.stock.find((el) => el.id === favorite.shoesId),
+        .find((item) => item.stock.find((elem) => elem.id === id))
+        ?.stock.find((el) => el.id === id),
     )
     .filter((item): item is ShoeStock => item !== undefined);
 
@@ -57,7 +57,7 @@ export default function Favorites({ navigation }: ListProps) {
     );
   }
 
-  if (favoriteShoes?.length === 0) {
+  if (!favoriteShoes?.id) {
     return (
       <View style={styles.emptyListContainer}>
         <TextBoldL>Vous n'avez pas encore de favoris</TextBoldL>

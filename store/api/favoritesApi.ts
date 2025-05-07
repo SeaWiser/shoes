@@ -1,49 +1,72 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 interface FavoriteItem {
-  id: string;
-
-  [key: string]: any;
+  id: string | null;
+  shoesIds: string[];
 }
 
 interface ApiResponse {
-  [key: string]: Omit<FavoriteItem, "id">;
+  [key: string]: string[];
 }
 
 export const favoritesApi = createApi({
   reducerPath: "favoritesApi",
   baseQuery: fetchBaseQuery({ baseUrl: process.env.EXPO_PUBLIC_API_URL }),
-  tagTypes: ["Favorites"],
   endpoints: (build) => ({
-    getAllFavorites: build.query<FavoriteItem[], void>({
-      providesTags: ["Favorites"],
+    getAllFavorites: build.query<FavoriteItem, void>({
       query: () => "favorites.json",
-      transformResponse: (response: ApiResponse) => {
-        const favorites: FavoriteItem[] = [];
+      transformResponse: (response: ApiResponse): FavoriteItem => {
+        const favorites: FavoriteItem = {} as FavoriteItem;
         for (const key in response) {
-          const favorite: FavoriteItem = {
-            id: key,
-            ...response[key],
-          };
-          favorites.push(favorite);
+          favorites.id = key;
+          favorites.shoesIds = [...response[key]];
         }
         return favorites;
       },
     }),
     addFavorite: build.mutation({
-      invalidatesTags: ["Favorites"],
       query: (shoesId) => ({
         url: "favorites.json",
         method: "POST",
-        body: shoesId,
+        body: [shoesId],
       }),
+      async onQueryStarted(shoesId, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          const patchResult = dispatch(
+            favoritesApi.util.upsertQueryData("getAllFavorites", undefined, {
+              id: data.name,
+              shoesIds: [shoesId],
+            }),
+          );
+        } catch {}
+      },
     }),
-    removeFavorite: build.mutation({
-      invalidatesTags: ["Favorites"],
-      query: ({ id }) => ({
+    updateFavorites: build.mutation({
+      query: ({ id, shoesIds }) => ({
         url: `favorites/${id}.json`,
-        method: "DELETE",
+        method: "PUT",
+        body: shoesIds,
       }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          favoritesApi.util.updateQueryData(
+            "getAllFavorites",
+            undefined,
+            (draft) => {
+              if (arg.shoesIds?.length === 0) {
+                draft.id = null;
+              }
+              draft.shoesIds = arg.shoesIds;
+            },
+          ),
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
     }),
   }),
 });
@@ -51,5 +74,5 @@ export const favoritesApi = createApi({
 export const {
   useGetAllFavoritesQuery,
   useAddFavoriteMutation,
-  useRemoveFavoriteMutation,
+  useUpdateFavoritesMutation,
 } = favoritesApi;
