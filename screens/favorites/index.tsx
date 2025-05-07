@@ -1,4 +1,10 @@
-import { View, StyleSheet, FlatList, ListRenderItem } from "react-native";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  ListRenderItem,
+  ActivityIndicator,
+} from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@constants/colors";
 import { RootStackParamList } from "@models/navigation";
@@ -8,24 +14,24 @@ import { spaces } from "@constants/spaces";
 import ListItemSeparator from "@ui-components/separators/ListItemSeparator";
 import { IS_LARGE_SCREEN, SCREEN_HEIGHT } from "@constants/sizes";
 import VerticalCard from "@ui-components/cards/VerticalCard";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
 import TextBoldL from "@ui-components/texts/TextBoldL";
+import { useGetAllFavoritesQuery } from "../../store/api/favoritesApi";
 
 type ListProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "List">;
 };
 
 export default function Favorites({ navigation }: ListProps) {
-  const favoritesShoesIds = useSelector(
-    (state: RootState) => state.favorites.favoritesShoesIds,
-  );
+  // const favoritesShoesIds = useSelector(
+  //   (state: RootState) => state.favorites.favoritesShoesIds,
+  // );
+  const { data: favoriteShoes, isLoading } = useGetAllFavoritesQuery();
 
-  const data = favoritesShoesIds
-    .map((id) =>
+  const data = favoriteShoes
+    ?.map((favorite) =>
       shoes
-        .find((item) => item.stock.find((elem) => elem.id === id))
-        ?.stock.find((el) => el.id === id),
+        .find((item) => item.stock.find((elem) => elem.id === favorite.shoesId))
+        ?.stock.find((el) => el.id === favorite.shoesId),
     )
     .filter((item): item is ShoeStock => item !== undefined);
 
@@ -43,7 +49,15 @@ export default function Favorites({ navigation }: ListProps) {
     </View>
   );
 
-  if (favoritesShoesIds.length === 0) {
+  if (isLoading) {
+    return (
+      <View style={styles.emptyListContainer}>
+        <ActivityIndicator size="large" color={colors.DARK} />
+      </View>
+    );
+  }
+
+  if (favoriteShoes?.length === 0) {
     return (
       <View style={styles.emptyListContainer}>
         <TextBoldL>Vous n'avez pas encore de favoris</TextBoldL>

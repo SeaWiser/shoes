@@ -6,12 +6,11 @@ import TextBoldL from "@ui-components/texts/TextBoldL";
 import TextMediumM from "@ui-components/texts/TextMediumM";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ICON_SIZE } from "@constants/sizes";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store/store";
 import {
-  addFavorite,
-  removeFavorite,
-} from "../../../store/slices/favoritesSlice";
+  useAddFavoriteMutation,
+  useGetAllFavoritesQuery,
+  useRemoveFavoriteMutation,
+} from "../../../store/api/favoritesApi";
 
 type DetailsDescriptionProps = {
   name: string;
@@ -26,18 +25,27 @@ export default function DetailsDescription({
   description,
   id,
 }: DetailsDescriptionProps) {
-  const dispatch = useDispatch();
-  const favoritesShoesIds = useSelector(
-    (state: RootState) => state.favorites.favoritesShoesIds,
-  );
-  const isFavorite = favoritesShoesIds.includes(id);
-  const iconName = isFavorite ? "star" : "staro";
+  // const dispatch = useDispatch();
+  // const favoritesShoesIds = useSelector(
+  //   (state: RootState) => state.favorites.favoritesShoesIds,
+  // );
+  // const isFavorite = favoritesShoesIds.includes(id);
+  const [addToFavorites] = useAddFavoriteMutation();
+  const [removeFromFavorites] = useRemoveFavoriteMutation();
+  const { data: favorite } = useGetAllFavoritesQuery(undefined, {
+    selectFromResult: ({ data }) => ({
+      data: data?.find((elem) => elem.shoesId === id),
+    }),
+  });
+  const iconName = favorite ? "star" : "staro";
 
   const toggleFavorite = () => {
-    if (isFavorite) {
-      dispatch(removeFavorite(id));
+    if (favorite) {
+      // dispatch(removeFavorite(id));
+      removeFromFavorites({ id: favorite.id });
     } else {
-      dispatch(addFavorite(id));
+      // dispatch(addFavorite(id));
+      addToFavorites({ shoesId: id });
     }
   };
 
