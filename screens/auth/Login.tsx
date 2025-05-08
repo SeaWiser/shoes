@@ -3,16 +3,15 @@ import AuthForm from "@screens/auth/components/AuthForm";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "@models/navigation";
 
-type SignupProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, "Signup">;
+type LoginProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Login">;
 };
 
-export default function Signup({ navigation }: SignupProps) {
-  const navigateToLogin = () => {
-    navigation.replace("Login");
+export default function Login({ navigation }: LoginProps) {
+  const navigateToSignup = () => {
+    navigation.replace("Signup");
   };
-
-  return <AuthForm navigate={navigateToLogin} />;
+  return <AuthForm loginScreen navigate={navigateToSignup} />;
 }
 
 const styles = StyleSheet.create({});

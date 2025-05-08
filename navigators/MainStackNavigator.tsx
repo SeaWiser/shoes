@@ -7,6 +7,7 @@ import { MainStackParamList } from "@models/navigation";
 import DrawerNavigator from "@navigators/DrawerNavigator";
 import Cart from "@screens/cart";
 import Signup from "@screens/auth/Signup";
+import Login from "@screens/auth/Login";
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
@@ -21,6 +22,11 @@ export default function MainStackNavigator() {
         headerTitleAlign: "center",
       })}
     >
+      <Stack.Screen
+        name="Login"
+        component={Login}
+        options={{ title: "Connexion" }}
+      />
       <Stack.Screen
         name="Signup"
         component={Signup}
