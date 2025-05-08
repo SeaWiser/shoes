@@ -8,27 +8,24 @@ import TextMediumS from "@ui-components/texts/TextMediumS";
 import { spaces } from "@constants/spaces";
 import { colors } from "@constants/colors";
 import { radius } from "@constants/radius";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store/store";
-import { addSeenNotification } from "../../../store/slices/notificationsSlice";
 
 type ListItemProps = {
   item: ShoeStock;
   navigateToDetails: (id: string) => void;
+  isSeen: boolean | undefined;
+  updateNotif: (id: string) => void;
 };
 
-export default function ListItem({ item, navigateToDetails }: ListItemProps) {
-  const dispatch = useDispatch();
-  const seenNotificationsIds = useSelector(
-    (state: RootState) => state.notifications.seenNotificationsIds,
-  );
-
-  const isSeen = seenNotificationsIds.includes(item.id);
-
+export default function ListItem({
+  item,
+  navigateToDetails,
+  isSeen,
+  updateNotif,
+}: ListItemProps) {
   const navigate = () => {
     navigateToDetails(item.id);
     setTimeout(() => {
-      dispatch(addSeenNotification(item.id));
+      updateNotif(item.id);
     }, 300);
   };
 

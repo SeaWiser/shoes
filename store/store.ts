@@ -4,6 +4,7 @@ import favoritesReducer from "./slices/favoritesSlice";
 import notificationsReducer from "./slices/notificationsSlice";
 import cartReducer from "./slices/cartSlice";
 import { favoritesApi } from "./api/favoritesApi";
+import { notificationsApi } from "./api/notificationsApi";
 
 export const store = configureStore({
   reducer: {
@@ -11,9 +12,12 @@ export const store = configureStore({
     notifications: notificationsReducer,
     cart: cartReducer,
     [favoritesApi.reducerPath]: favoritesApi.reducer,
+    [notificationsApi.reducerPath]: notificationsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(favoritesApi.middleware),
+    getDefaultMiddleware()
+      .concat(favoritesApi.middleware)
+      .concat(notificationsApi.middleware),
   enhancers: (getDefaultEnhancer) =>
     getDefaultEnhancer().concat(reactotron.createEnhancer()),
 });

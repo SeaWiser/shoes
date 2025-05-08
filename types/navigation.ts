@@ -16,4 +16,5 @@ export type MainStackParamList = {
   };
   Drawer: undefined;
   MainCart: undefined;
+  Signup: undefined;
 };

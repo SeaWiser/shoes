@@ -6,6 +6,7 @@ import Details from "@screens/details";
 import { MainStackParamList } from "@models/navigation";
 import DrawerNavigator from "@navigators/DrawerNavigator";
 import Cart from "@screens/cart";
+import Signup from "@screens/auth/Signup";
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
@@ -20,6 +21,13 @@ export default function MainStackNavigator() {
         headerTitleAlign: "center",
       })}
     >
+      <Stack.Screen
+        name="Signup"
+        component={Signup}
+        options={{
+          title: "Formulaire d'inscription",
+        }}
+      />
       <Stack.Screen
         name="Drawer"
         component={DrawerNavigator}

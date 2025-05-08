@@ -1,4 +1,4 @@
-import { StyleSheet, FlatList } from "react-native";
+import { StyleSheet, FlatList, View, ActivityIndicator } from "react-native";
 import { shoes } from "@data/shoes";
 import { colors } from "@constants/colors";
 import ItemSeparator from "@ui-components/separators/ListItemSeparator";
@@ -7,6 +7,11 @@ import ListItem from "@screens/notifications/components/ListItem";
 import { ShoeStock } from "@models/shoe";
 import { MainStackParamList } from "@models/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import {
+  useAddSeenNotificationsMutation,
+  useGetAllSeenNotificationsQuery,
+  useUpdateSeenNotificationsMutation,
+} from "../../store/api/notificationsApi";
 
 const ids = ["nik64p", "adi7p", "adi203p"];
 
@@ -15,6 +20,10 @@ type NotificationsProps = {
 };
 
 export default function Notifications({ navigation }: NotificationsProps) {
+  const { data: seenNotifs, isLoading } = useGetAllSeenNotificationsQuery();
+  const [addSeenNotif] = useAddSeenNotificationsMutation();
+  const [updateSeenNotif] = useUpdateSeenNotificationsMutation();
+
   const data = ids
     .map((id) =>
       shoes
@@ -26,9 +35,36 @@ export default function Notifications({ navigation }: NotificationsProps) {
   const navigateToDetails = (id: string) =>
     navigation.navigate("Details", { id });
 
+  const updateNotif = (id: string) => {
+    if (seenNotifs?.id) {
+      const currentNotifs = seenNotifs.notifsIds || [];
+      if (!currentNotifs.includes(id)) {
+        updateSeenNotif({
+          id: seenNotifs.id,
+          notifsIds: [...currentNotifs, id],
+        });
+      }
+    } else {
+      addSeenNotif(id);
+    }
+  };
+
   const renderItem = ({ item }: { item: ShoeStock }) => (
-    <ListItem item={item} navigateToDetails={navigateToDetails} />
+    <ListItem
+      item={item}
+      navigateToDetails={navigateToDetails}
+      isSeen={seenNotifs?.notifsIds?.includes(item.id)}
+      updateNotif={updateNotif}
+    />
   );
+
+  if (isLoading) {
+    return (
+      <View style={styles.emptyListContainer}>
+        <ActivityIndicator size="large" color={colors.DARK} />
+      </View>
+    );
+  }
 
   return (
     <FlatList
@@ -42,6 +78,12 @@ export default function Notifications({ navigation }: NotificationsProps) {
 }
 
 const styles = StyleSheet.create({
+  emptyListContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.LIGHT,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.LIGHT,
