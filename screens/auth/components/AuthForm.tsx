@@ -3,17 +3,37 @@ import * as Yup from "yup";
 import { spaces } from "@constants/spaces";
 import { colors } from "@constants/colors";
 import Input from "@ui-components/inputs/Input";
-import { Formik } from "formik";
+import { Formik, FormikHelpers } from "formik";
 import CustomButton from "@ui-components/buttons/CustomButton";
 import TextMediumM from "@ui-components/texts/TextMediumM";
 import TextBoldM from "@ui-components/texts/TextBoldM";
 
+type BaseFormValues = {
+  email: string;
+  password: string;
+};
+
+type AuthFormValues = BaseFormValues &
+  Partial<{
+    confirmPassword: string;
+  }>;
+
 type AuthFormProps = {
   loginScreen?: boolean;
   navigate: () => void;
+  submitFormHandler: (
+    values: AuthFormValues,
+    formikHelpers: FormikHelpers<AuthFormValues>,
+  ) => void | Promise<void>;
+  isLoading?: boolean;
 };
 
-export default function AuthForm({ loginScreen, navigate }: AuthFormProps) {
+export default function AuthForm({
+  loginScreen,
+  navigate,
+  submitFormHandler,
+  isLoading,
+}: AuthFormProps) {
   const initialValues = loginScreen
     ? { email: "", password: "" }
     : {
@@ -47,7 +67,7 @@ export default function AuthForm({ loginScreen, navigate }: AuthFormProps) {
     <View style={styles.formContainer}>
       <Formik
         initialValues={initialValues}
-        onSubmit={(values) => console.log(values)}
+        onSubmit={submitFormHandler}
         validationSchema={validationSchema}
       >
         {({
@@ -93,7 +113,11 @@ export default function AuthForm({ loginScreen, navigate }: AuthFormProps) {
                 type="password"
               />
             ) : null}
-            <CustomButton text="Valider" onPress={handleSubmit} />
+            <CustomButton
+              text="Valider"
+              onPress={handleSubmit}
+              isLoading={isLoading}
+            />
           </>
         )}
       </Formik>
