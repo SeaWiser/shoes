@@ -4,13 +4,17 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "@models/navigation";
 import { useLazyGetUserQuery } from "../../store/api/userApi";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setUserId } from "../../store/slices/userSlice";
 
 type LoginProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login">;
 };
 
 export default function Login({ navigation }: LoginProps) {
+  const dispatch = useDispatch();
   const [getUser, { data, isFetching }] = useLazyGetUserQuery();
+
   const navigateToSignup = () => {
     navigation.replace("Signup");
   };
@@ -20,6 +24,7 @@ export default function Login({ navigation }: LoginProps) {
 
   useEffect(() => {
     if (data?.id) {
+      dispatch(setUserId(data?.id));
       navigation.replace("Drawer");
     }
   }, [data]);

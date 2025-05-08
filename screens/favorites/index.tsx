@@ -16,15 +16,18 @@ import { IS_LARGE_SCREEN, SCREEN_HEIGHT } from "@constants/sizes";
 import VerticalCard from "@ui-components/cards/VerticalCard";
 import TextBoldL from "@ui-components/texts/TextBoldL";
 import { useGetAllFavoritesQuery } from "../../store/api/favoritesApi";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { useGetUserByIdQuery } from "../../store/api/userApi";
 
 type ListProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "List">;
 };
 
 export default function Favorites({ navigation }: ListProps) {
-  // const favoritesShoesIds = useSelector(
-  //   (state: RootState) => state.favorites.favoritesShoesIds,
-  // );
+  const userId = useSelector((state: RootState) => state.user.id);
+  const { data: user, isLoading: userLoading } = useGetUserByIdQuery(userId);
+  console.log({ userId, user });
   const { data: favoriteShoes, isLoading } = useGetAllFavoritesQuery();
 
   const data = favoriteShoes?.shoesIds

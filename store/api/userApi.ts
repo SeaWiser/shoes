@@ -28,6 +28,9 @@ export const userApi = createApi({
         return user;
       },
     }),
+    getUserById: builder.query({
+      query: (id) => `users/${id}.json`,
+    }),
     createUser: builder.mutation({
       query: (user) => ({
         url: "users.json",
@@ -38,8 +41,32 @@ export const userApi = createApi({
         return { id: response.name };
       },
     }),
+    updateUser: builder.mutation({
+      query: ({ id, ...patch }) => ({
+        url: `users/${id}.json`,
+        method: "PATCH",
+        body: patch,
+      }),
+      async onQueryStarted({ id, ...patch }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          userApi.util.updateQueryData("getUserById", id, (draft) => {
+            Object.assign(draft, patch);
+          }),
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
   }),
 });
 
-export const { useGetUserQuery, useCreateUserMutation, useLazyGetUserQuery } =
-  userApi;
+export const {
+  useGetUserQuery,
+  useGetUserByIdQuery,
+  useUpdateUserMutation,
+  useCreateUserMutation,
+  useLazyGetUserQuery,
+} = userApi;

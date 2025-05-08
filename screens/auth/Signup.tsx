@@ -4,13 +4,16 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "@models/navigation";
 import { useCreateUserMutation } from "../../store/api/userApi";
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setUserId } from "../../store/slices/userSlice";
 
 type SignupProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Signup">;
 };
 
 export default function Signup({ navigation }: SignupProps) {
-  const [createUser, { isLoading, isSuccess }] = useCreateUserMutation();
+  const dispatch = useDispatch();
+  const [createUser, { data, isLoading, isSuccess }] = useCreateUserMutation();
   const navigateToLogin = () => {
     navigation.replace("Login");
   };
@@ -21,6 +24,7 @@ export default function Signup({ navigation }: SignupProps) {
 
   useEffect(() => {
     if (isSuccess) {
+      dispatch(setUserId(data?.id));
       navigation.replace("Drawer");
     }
   }, [isSuccess]);
