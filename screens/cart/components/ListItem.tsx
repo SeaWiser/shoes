@@ -1,5 +1,4 @@
 import { View, StyleSheet, Image, Pressable, Platform } from "react-native";
-import { CartShoe } from "@models/shoe";
 import TextBoldL from "@ui-components/texts/TextBoldL";
 import TextBoldXL from "@ui-components/texts/TextBoldXL";
 import TextBoldM from "@ui-components/texts/TextBoldM";
@@ -8,27 +7,30 @@ import { ICON_SIZE } from "@constants/sizes";
 import { colors } from "@constants/colors";
 import { spaces } from "@constants/spaces";
 import { radius } from "@constants/radius";
-import { useDispatch } from "react-redux";
-import {
-  decreaseQuantity,
-  increaseQuantity,
-  removeShoesFromCart,
-} from "../../../store/slices/cartSlice";
+import { CartItem } from "@models/cart";
 
 type ListItemProps = {
-  item: CartShoe;
+  item: CartItem;
+  removeShoesFromCart: (id: string) => void;
+  updateQuantity: (id: string, increase: boolean) => void;
 };
 
-export default function ListItem({ item }: ListItemProps) {
-  const dispatch = useDispatch();
+export default function ListItem({
+  item,
+  removeShoesFromCart,
+  updateQuantity,
+}: ListItemProps) {
+  const decreaseShoesQuantity = () => {
+    if (item.quantity > 1) {
+      updateQuantity(item.id, false);
+    }
+  };
 
-  const decreaseShoesQuantity = () =>
-    dispatch(decreaseQuantity({ id: item.id }));
+  const increaseShoesQuantity = () => {
+    updateQuantity(item.id, true);
+  };
 
-  const increaseShoesQuantity = () =>
-    dispatch(increaseQuantity({ id: item.id }));
-
-  const removeShoes = () => dispatch(removeShoesFromCart({ id: item.id }));
+  const removeShoes = () => removeShoesFromCart(item.id);
 
   return (
     <View style={styles.container}>

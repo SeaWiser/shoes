@@ -15,7 +15,6 @@ import ListItemSeparator from "@ui-components/separators/ListItemSeparator";
 import { IS_LARGE_SCREEN, SCREEN_HEIGHT } from "@constants/sizes";
 import VerticalCard from "@ui-components/cards/VerticalCard";
 import TextBoldL from "@ui-components/texts/TextBoldL";
-import { useGetAllFavoritesQuery } from "../../store/api/favoritesApi";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { useGetUserByIdQuery } from "../../store/api/userApi";
@@ -26,17 +25,14 @@ type ListProps = {
 
 export default function Favorites({ navigation }: ListProps) {
   const userId = useSelector((state: RootState) => state.user.id);
-  const { data: user, isLoading: userLoading } = useGetUserByIdQuery(userId);
+  const { data: user, isLoading } = useGetUserByIdQuery(userId);
   console.log({ userId, user });
-  const { data: favoriteShoes, isLoading } = useGetAllFavoritesQuery();
 
-  const data = favoriteShoes?.shoesIds
-    ?.map((id) =>
-      shoes
-        .find((item) => item.stock.find((elem) => elem.id === id))
-        ?.stock.find((el) => el.id === id),
-    )
-    .filter((item): item is ShoeStock => item !== undefined);
+  const data = user?.favoritesIds?.map((id) =>
+    shoes
+      .find((item) => item.stock.find((elem) => elem.id === id))
+      ?.stock.find((el) => el.id === id),
+  );
 
   const navigateToDetails = (id: string) =>
     navigation.navigate("Details", { id });
@@ -60,7 +56,7 @@ export default function Favorites({ navigation }: ListProps) {
     );
   }
 
-  if (!favoriteShoes?.id) {
+  if (!user?.favoritesIds?.length) {
     return (
       <View style={styles.emptyListContainer}>
         <TextBoldL>Vous n'avez pas encore de favoris</TextBoldL>

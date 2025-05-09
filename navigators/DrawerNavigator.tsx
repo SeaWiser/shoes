@@ -19,9 +19,10 @@ import CartIcon from "@assets/images/navigation/cart.svg";
 import NotificationsIcon from "@assets/images/navigation/notifications.svg";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
+import { useGetUserByIdQuery } from "../store/api/userApi";
 
 type LabelProps = {
-  shoesInCartCount: number;
+  shoesInCartCount: number | undefined;
   label: string;
   activeIndex: number;
   index: number;
@@ -81,10 +82,10 @@ const Label = ({ shoesInCartCount, label, activeIndex, index }: LabelProps) => {
 };
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
+  const userId = useSelector((state: RootState) => state.user.id);
+  const { data: user } = useGetUserByIdQuery(userId);
   const activeIndex = props.state.routes[0].state?.index || 0;
-  const shoesInCartCount = useSelector(
-    (state: RootState) => state.cart.shoes.length,
-  );
+  const shoesInCartCount = user?.cart?.shoes?.length;
 
   return (
     <DrawerContentScrollView>

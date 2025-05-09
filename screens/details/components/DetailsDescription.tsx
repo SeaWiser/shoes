@@ -6,11 +6,12 @@ import TextBoldL from "@ui-components/texts/TextBoldL";
 import TextMediumM from "@ui-components/texts/TextMediumM";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ICON_SIZE } from "@constants/sizes";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
 import {
-  useAddFavoriteMutation,
-  useGetAllFavoritesQuery,
-  useUpdateFavoritesMutation,
-} from "../../../store/api/favoritesApi";
+  useGetUserByIdQuery,
+  useUpdateUserMutation,
+} from "../../../store/api/userApi";
 
 type DetailsDescriptionProps = {
   name: string;
@@ -25,37 +26,32 @@ export default function DetailsDescription({
   description,
   id,
 }: DetailsDescriptionProps) {
-  // const dispatch = useDispatch();
-  // const favoritesShoesIds = useSelector(
-  //   (state: RootState) => state.favorites.favoritesShoesIds,
-  // );
-  // const isFavorite = favoritesShoesIds.includes(id);
-  const [addToFavorites] = useAddFavoriteMutation();
-  const [updateFavorites] = useUpdateFavoritesMutation();
-  const { data: favorite, favorites } = useGetAllFavoritesQuery(undefined, {
-    selectFromResult: ({ data }) => ({
-      data: data?.shoesIds?.find((elem) => elem === id),
-      favorites: data,
-    }),
-  });
-  const iconName = favorite ? "star" : "staro";
+  const userId = useSelector((state: RootState) => state.user.id);
+  const { data: user } = useGetUserByIdQuery(userId);
+  const [updateUser] = useUpdateUserMutation();
+  const isFavorite = user?.favoritesIds?.includes(id);
+
+  const iconName = isFavorite ? "star" : "staro";
 
   const toggleFavorite = () => {
-    if (favorite && favorites) {
+    if (isFavorite) {
       // remove fron favorites
-      updateFavorites({
-        id: favorites.id,
-        shoesIds: favorites.shoesIds.filter((el) => el !== id),
+      updateUser({
+        id: userId,
+        favoritesIds: user?.favoritesIds.filter((el) => el !== id),
       });
-    } else if (favorites?.id) {
+    } else if (user?.favoritesIds) {
       // add to existing favorites
-      updateFavorites({
-        id: favorites.id,
-        shoesIds: [...favorites.shoesIds, id],
+      updateUser({
+        id: userId,
+        shoesIds: [...user.favoritesIds, id],
       });
     } else {
       // create document with first favorite item
-      addToFavorites(id);
+      updateUser({
+        id: userId,
+        favoritesIds: [id],
+      });
     }
   };
 

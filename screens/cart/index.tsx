@@ -11,12 +11,57 @@ import { radius } from "@constants/radius";
 import CustomButton from "@ui-components/buttons/CustomButton";
 import DashedLine from "@ui-components/separators/DashedLine";
 import { IS_LARGE_SCREEN } from "@constants/sizes";
+import {
+  useGetUserByIdQuery,
+  useUpdateUserMutation,
+} from "../../store/api/userApi";
 
 export default function Cart() {
-  const state = useSelector((state: RootState) => state.cart);
-  const { shoes, totalAmount } = state;
+  const userId = useSelector((state: RootState) => state.user.id);
+  const { data: user, isLoading } = useGetUserByIdQuery(userId);
+  const [updateUser] = useUpdateUserMutation();
+  // const state = useSelector((state: RootState) => state.cart);
+  // const { shoes, totalAmount } = state;
 
-  if (shoes.length === 0) {
+  const totalAmount = user?.cart?.totalAmount;
+
+  const removeShoesFromCart = (id: string) => {
+    if (!user?.cart?.shoes || !user.cart.totalAmount) return;
+
+    const shoesToRemove = user.cart.shoes.find((el) => el.id === id);
+    if (!shoesToRemove?.price || !shoesToRemove.quantity) return;
+
+    const newCart = {
+      shoes: user.cart.shoes.filter((el) => el.id !== id),
+      totalAmount:
+        user.cart.totalAmount - shoesToRemove.price * shoesToRemove.quantity,
+    };
+
+    updateUser({
+      id: userId,
+      cart: newCart,
+    });
+  };
+
+  const updateQuantity = (id: string, increase: boolean) => {
+    const newCart = JSON.parse(JSON.stringify(user?.cart));
+    const index = newCart.shoes.indexOf(
+      newCart.shoes.find((el: any) => el.id === id),
+    );
+    if (increase) {
+      newCart.shoes[index].quantity += 1;
+      newCart.totalAmount += newCart.shoes[index].price;
+    } else {
+      newCart.shoes[index].quantity -= 1;
+      newCart.totalAmount -= newCart.shoes[index].price;
+    }
+    updateUser({
+      id: userId,
+      cart: newCart,
+    });
+  };
+
+  if (!user?.cart?.shoes?.length || !totalAmount) {
     return (
       <View style={styles.listEmptyContainer}>
         <TextBoldL>Votre panier est vide</TextBoldL>
@@ -26,10 +71,16 @@ export default function Cart() {
   return (
     <View style={styles.container}>
       <FlatList
-        data={shoes}
+        data={user?.cart?.shoes}
         showsVerticalScrollIndicator={false}
         keyExtractor={({ id }) => id}
-        renderItem={({ item }) => <ListItem item={item} />}
+        renderItem={({ item }) => (
+          <ListItem
+            item={item}
+            removeShoesFromCart={removeShoesFromCart}
+            updateQuantity={updateQuantity}
+          />
+        )}
         style={styles.listContainer}
         ItemSeparatorComponent={() => <ItemSeparator height={spaces.L} />}
         numColumns={IS_LARGE_SCREEN ? 2 : 1}

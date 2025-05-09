@@ -7,11 +7,12 @@ import ListItem from "@screens/notifications/components/ListItem";
 import { ShoeStock } from "@models/shoe";
 import { MainStackParamList } from "@models/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 import {
-  useAddSeenNotificationsMutation,
-  useGetAllSeenNotificationsQuery,
-  useUpdateSeenNotificationsMutation,
-} from "../../store/api/notificationsApi";
+  useGetUserByIdQuery,
+  useUpdateUserMutation,
+} from "../../store/api/userApi";
 
 const ids = ["nik64p", "adi7p", "adi203p"];
 
@@ -20,9 +21,9 @@ type NotificationsProps = {
 };
 
 export default function Notifications({ navigation }: NotificationsProps) {
-  const { data: seenNotifs, isLoading } = useGetAllSeenNotificationsQuery();
-  const [addSeenNotif] = useAddSeenNotificationsMutation();
-  const [updateSeenNotif] = useUpdateSeenNotificationsMutation();
+  const userId = useSelector((state: RootState) => state.user.id);
+  const { data: user, isLoading } = useGetUserByIdQuery(userId);
+  const [updateUser] = useUpdateUserMutation();
 
   const data = ids
     .map((id) =>
@@ -36,16 +37,16 @@ export default function Notifications({ navigation }: NotificationsProps) {
     navigation.navigate("Details", { id });
 
   const updateNotif = (id: string) => {
-    if (seenNotifs?.id) {
-      const currentNotifs = seenNotifs.notifsIds || [];
-      if (!currentNotifs.includes(id)) {
-        updateSeenNotif({
-          id: seenNotifs.id,
-          notifsIds: [...currentNotifs, id],
-        });
-      }
+    if (user?.seenNotifsIds) {
+      updateUser({
+        id: userId,
+        seenNotifsIds: [...user.seenNotifsIds, id],
+      });
     } else {
-      addSeenNotif(id);
+      updateUser({
+        id: userId,
+        seenNotifsIds: [id],
+      });
     }
   };
 
@@ -53,7 +54,7 @@ export default function Notifications({ navigation }: NotificationsProps) {
     <ListItem
       item={item}
       navigateToDetails={navigateToDetails}
-      isSeen={seenNotifs?.notifsIds?.includes(item.id)}
+      isSeen={user?.seenNotifsIds?.includes(item.id)}
       updateNotif={updateNotif}
     />
   );

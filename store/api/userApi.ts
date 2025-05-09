@@ -1,9 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-interface User {
-  id: string;
-  email: string;
-}
+import { User } from "@models/user";
 
 interface UsersResponse {
   [key: string]: Omit<User, "id">;
@@ -28,7 +24,7 @@ export const userApi = createApi({
         return user;
       },
     }),
-    getUserById: builder.query({
+    getUserById: builder.query<User, string>({
       query: (id) => `users/${id}.json`,
     }),
     createUser: builder.mutation({

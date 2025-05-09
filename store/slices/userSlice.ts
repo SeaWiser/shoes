@@ -2,6 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserState {
   id: string;
+  email?: string;
+  favoritesIds?: string[];
 }
 
 const initialState: UserState = {
