@@ -10,8 +10,8 @@ import { SMALL_ICON_SIZE } from "@constants/sizes";
 
 type InputProps = {
   label: string;
-  error: boolean | undefined;
-  errorText: string | undefined;
+  error?: boolean | undefined;
+  errorText?: string | undefined;
   type?: "password";
 } & Omit<TextInputProps, "secureTextEntry">;
 
@@ -26,6 +26,9 @@ export default function Input({
   const inputContainerStyle = error
     ? StyleSheet.compose(styles.inputContainer, styles.inputError)
     : styles.inputContainer;
+  const inputStyle = inputProps.readOnly
+    ? StyleSheet.compose(styles.input, styles.readOnlyInput)
+    : styles.input;
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible((prev) => !prev);
@@ -36,7 +39,7 @@ export default function Input({
       <TextBoldL style={styles.label}>{label}</TextBoldL>
       <View style={inputContainerStyle}>
         <TextInput
-          style={styles.input}
+          style={inputStyle}
           {...inputProps}
           secureTextEntry={type === "password" && !isPasswordVisible}
         />
@@ -77,6 +80,9 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
+  },
+  readOnlyInput: {
+    color: colors.GREY,
   },
   inputError: {
     borderColor: colors.RED,

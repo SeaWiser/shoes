@@ -56,6 +56,7 @@ export default function MainStackNavigator() {
         name="MainCart"
         component={Cart}
         options={({ navigation }) => ({
+          title: "Panier",
           animation: "slide_from_bottom",
           headerLeft: () => (
             <Pressable onPress={() => navigation.goBack()}>

@@ -1,11 +1,40 @@
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { colors } from "@constants/colors";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import {
+  useGetUserByIdQuery,
+  useUpdateUserMutation,
+} from "../../store/api/userApi";
+import ProfileForm from "@screens/profile/components/ProfileForm";
+import { FormikValues } from "formik";
 
 export default function Profile() {
+  const userId = useSelector((state: RootState) => state.user.id);
+  const { data: user, isLoading } = useGetUserByIdQuery(userId);
+  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
+
+  const updateUserProfile = (values: FormikValues) => {
+    updateUser({
+      id: userId,
+      ...values,
+    });
+  };
+
+  if (isLoading || !user) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color={colors.DARK} />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Profile</Text>
-    </View>
+    <ProfileForm
+      user={user}
+      isLoading={isUpdating}
+      submitFormHandler={updateUserProfile}
+    />
   );
 }
 
