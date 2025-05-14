@@ -1,6 +1,5 @@
 import { StyleSheet, View, Image } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import Touchable from "@ui-components/touchable/Touchable";
 import { ShoeStock } from "@models/shoe";
 import { colors } from "@constants/colors";
 import { radius } from "@constants/radius";
@@ -14,6 +13,7 @@ import TextMediumS from "@ui-components/texts/TextMediumS";
 import TextBoldL from "@ui-components/texts/TextBoldL";
 import TextMediumM from "@ui-components/texts/TextMediumM";
 import { colors as iconColors } from "@constants/colors";
+import Touchable from "@ui-components/touchable/Touchable";
 
 type VerticalCardProps = {
   item: ShoeStock;

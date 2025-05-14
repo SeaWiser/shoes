@@ -13,7 +13,8 @@
       "@screens/*": ["screens/*"],
       "@models/*": ["types/*"],
       "@ui-components/*": ["ui-components/*"],
-      "@utils/*": ["utils/*"]
+      "@utils/*": ["utils/*"],
+      "@lib/*": ["lib/*"]
     }
   }
 }

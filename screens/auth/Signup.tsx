@@ -1,11 +1,12 @@
-import { StyleSheet } from "react-native";
 import AuthForm from "@screens/auth/components/AuthForm";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "@models/navigation";
-import { useCreateUserMutation } from "../../store/api/userApi";
-import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setUserId } from "../../store/slices/userSlice";
+import { useEffect } from "react";
+import { useSignMutation } from "../../store/api/authApi";
+import { setToken } from "../../store/slices/authSlice";
+import { AuthFormValues } from "@models/auth";
+// import { useCreateUserMutation } from "../../store/api/userApi";
 
 type SignupProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Signup">;
@@ -13,29 +14,35 @@ type SignupProps = {
 
 export default function Signup({ navigation }: SignupProps) {
   const dispatch = useDispatch();
-  const [createUser, { data, isLoading, isSuccess }] = useCreateUserMutation();
+  const [signUp, { data, isLoading, error }] = useSignMutation();
+  // const [createUser, { data, isLoading, isSuccess }] = useCreateUserMutation();
+
   const navigateToLogin = () => {
     navigation.replace("Login");
   };
 
-  const submitFormHandler = (values: { email: string }) => {
-    createUser({ email: values.email });
+  const submitFormHandler = (values: AuthFormValues) => {
+    signUp({
+      email: values.email,
+      password: values.password,
+      endpoint: "signUp",
+    });
+    // createUser({email: values.email, password: values.password});
   };
 
   useEffect(() => {
-    if (isSuccess) {
-      dispatch(setUserId(data?.id));
-      navigation.replace("Drawer");
+    if (data) {
+      dispatch(setToken(data.idToken));
+      // dispatch(setUserId(data?.id));
     }
-  }, [isSuccess]);
+  }, [data]);
 
   return (
     <AuthForm
       navigate={navigateToLogin}
       submitFormHandler={submitFormHandler}
       isLoading={isLoading}
+      error={error}
     />
   );
 }
-
-const styles = StyleSheet.create({});

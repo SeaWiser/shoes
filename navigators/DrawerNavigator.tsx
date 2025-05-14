@@ -17,9 +17,10 @@ import ProfileIcon from "@assets/images/navigation/user.svg";
 import FavoriteIcon from "@assets/images/navigation/favorite.svg";
 import CartIcon from "@assets/images/navigation/cart.svg";
 import NotificationsIcon from "@assets/images/navigation/notifications.svg";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useGetUserByIdQuery } from "../store/api/userApi";
+import { setToken } from "../store/slices/authSlice";
 
 type LabelProps = {
   shoesInCartCount: number | undefined;
@@ -82,10 +83,15 @@ const Label = ({ shoesInCartCount, label, activeIndex, index }: LabelProps) => {
 };
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
+  const dispatch = useDispatch();
   const userId = useSelector((state: RootState) => state.user.id);
   const { data: user } = useGetUserByIdQuery(userId);
   const activeIndex = props.state.routes[0].state?.index || 0;
   const shoesInCartCount = user?.cart?.shoes?.length;
+
+  const logout = () => {
+    dispatch(setToken(undefined));
+  };
 
   return (
     <DrawerContentScrollView>
@@ -145,7 +151,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           />
         )}
         labelStyle={[styles.label, { color: colors.GREY }]}
-        onPress={() => console.log()}
+        onPress={() => logout()}
       />
     </DrawerContentScrollView>
   );

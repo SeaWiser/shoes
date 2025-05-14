@@ -26,6 +26,7 @@ type AuthFormProps = {
     formikHelpers: FormikHelpers<AuthFormValues>,
   ) => void | Promise<void>;
   isLoading?: boolean;
+  error: any;
 };
 
 export default function AuthForm({

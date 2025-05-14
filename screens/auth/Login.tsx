@@ -2,10 +2,11 @@ import { StyleSheet } from "react-native";
 import AuthForm from "@screens/auth/components/AuthForm";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "@models/navigation";
-import { useLazyGetUserQuery } from "../../store/api/userApi";
-import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setUserId } from "../../store/slices/userSlice";
+import { useEffect } from "react";
+import { useSignMutation } from "../../store/api/authApi";
+import { AuthFormValues } from "@models/auth";
+import { setToken } from "../../store/slices/authSlice";
 
 type LoginProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login">;
@@ -13,19 +14,23 @@ type LoginProps = {
 
 export default function Login({ navigation }: LoginProps) {
   const dispatch = useDispatch();
-  const [getUser, { data, isFetching }] = useLazyGetUserQuery();
+  const [signIn, { data, isLoading, error }] = useSignMutation();
 
   const navigateToSignup = () => {
     navigation.replace("Signup");
   };
-  const submitFormHandler = (values: { email: string }) => {
-    getUser({ email: values.email });
+
+  const submitFormHandler = (values: AuthFormValues) => {
+    signIn({
+      email: values.email,
+      password: values.password,
+      endpoint: "signInWithPassword",
+    });
   };
 
   useEffect(() => {
-    if (data?.id) {
-      dispatch(setUserId(data?.id));
-      navigation.replace("Drawer");
+    if (data) {
+      dispatch(setToken(data.idToken));
     }
   }, [data]);
 
@@ -34,7 +39,8 @@ export default function Login({ navigation }: LoginProps) {
       loginScreen
       navigate={navigateToSignup}
       submitFormHandler={submitFormHandler}
-      isLoading={isFetching}
+      isLoading={isLoading}
+      error={error}
     />
   );
 }

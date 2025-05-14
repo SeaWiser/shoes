@@ -1,3 +1,4 @@
+import 'react-native-url-polyfill/auto';
 if (__DEV__) require("./ReactotronConfig");
 import { store } from "./store/store";
 import { Provider } from "react-redux";
