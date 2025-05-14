@@ -5,17 +5,29 @@ node_modules/
 
 # Expo
 .expo/
+.expo-shared/
 dist/
 web-build/
 expo-env.d.ts
 
-# Native
-*.orig.*
-*.jks
-*.p8
-*.p12
-*.key
-*.mobileprovision
+# Firebase
+ios/GoogleService-Info.plist
+android/app/google-services.json
+
+# Native - iOS
+ios/build/
+ios/Pods/
+ios/.xcworkspace/
+ios/*.xcodeproj/project.xcworkspace/
+ios/*.xcodeproj/xcuserdata/
+
+# Native - Android
+android/.gradle/
+android/.idea/
+android/local.properties
+android/.cxx/
+android/app/build/
+android/build/
 
 # Metro
 .metro-health-check*
@@ -29,9 +41,26 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# Keys / sensitive
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.keystore
+*.mobileprovision
+credentials.json
+
 # local env files
 .env*.local
 .env
 
 # typescript
 *.tsbuildinfo
+
+# IDE
+.vscode/
+*.swp
+*.swo
+*.tmp
+.env
