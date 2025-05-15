@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useGetUserByIdQuery } from "../store/api/userApi";
 import { setToken } from "../store/slices/authSlice";
+import * as SecureStore from "expo-secure-store";
 
 type LabelProps = {
   shoesInCartCount: number | undefined;
@@ -95,6 +96,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
 
   const logout = () => {
     dispatch(setToken(undefined));
+    SecureStore.deleteItemAsync("refreshToken");
   };
 
   return (

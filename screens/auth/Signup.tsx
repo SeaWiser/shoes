@@ -7,6 +7,7 @@ import { useSignMutation } from "../../store/api/authApi";
 import { setToken, setUserId } from "../../store/slices/authSlice";
 import { AuthFormValues } from "@models/auth";
 import { useCreateUserMutation } from "../../store/api/userApi";
+import * as SecureStore from "expo-secure-store";
 
 type SignupProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Signup">;
@@ -41,6 +42,7 @@ export default function Signup({ navigation }: SignupProps) {
     if (data?.idToken && user) {
       dispatch(setToken(data.idToken));
       dispatch(setUserId(data.localId));
+      SecureStore.setItemAsync("refreshToken", data.refreshToken);
     }
   }, [data, user, dispatch]);
 

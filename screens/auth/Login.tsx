@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { useSignMutation } from "../../store/api/authApi";
 import { AuthFormValues } from "@models/auth";
 import { setToken, setUserId } from "../../store/slices/authSlice";
+import * as SecureStore from "expo-secure-store";
 
 type LoginProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login">;
@@ -32,6 +33,7 @@ export default function Login({ navigation }: LoginProps) {
     if (data) {
       dispatch(setToken(data.idToken));
       dispatch(setUserId(data.localId));
+      SecureStore.setItemAsync("refreshToken", data.refreshToken);
     }
   }, [data]);
 

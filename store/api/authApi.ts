@@ -15,6 +15,15 @@ interface AuthResponse {
   error?: string;
 }
 
+interface RefreshTokenResponse {
+  expires_in: string;
+  token_type: string;
+  refresh_token: string;
+  id_token: string;
+  user_id: string;
+  project_id: string;
+}
+
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({ baseUrl: process.env.EXPO_PUBLIC_AUTH_URL }),
@@ -26,10 +35,7 @@ export const authApi = createApi({
         body: { email, password, returnSecureToken: true },
       }),
     }),
-    refreshToken: builder.mutation<
-      { access_token: string; expires_in: string; token_type: string },
-      string
-    >({
+    refreshToken: builder.mutation<RefreshTokenResponse, string>({
       query: (refreshToken) => ({
         url:
           String(process.env.EXPO_PUBLIC_FIREBASE_TOKEN_URL) +
