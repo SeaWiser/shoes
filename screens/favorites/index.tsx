@@ -24,8 +24,11 @@ type ListProps = {
 };
 
 export default function Favorites({ navigation }: ListProps) {
-  const userId = useSelector((state: RootState) => state.user.id);
-  const { data: user, isLoading } = useGetUserByIdQuery(userId);
+  const { userId, token } = useSelector((state: RootState) => state.auth);
+  const { data: user, isLoading } = useGetUserByIdQuery(
+    { userId: userId!, token: token! },
+    { skip: !userId || !token },
+  );
   console.log({ userId, user });
 
   const data = user?.favoritesIds?.map((id) =>

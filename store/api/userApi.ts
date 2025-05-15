@@ -24,30 +24,34 @@ export const userApi = createApi({
         return user;
       },
     }),
-    getUserById: builder.query<User, string>({
-      query: (id) => `users/${id}.json`,
+    getUserById: builder.query<User, { userId: string; token: string }>({
+      query: ({ userId, token }) => `users/${userId}.json?auth=${token}`,
     }),
     createUser: builder.mutation({
-      query: (user) => ({
-        url: "users.json",
-        method: "POST",
+      query: ({ user, token, id }) => ({
+        url: `users/${id}.json?auth=${token}`,
+        method: "PUT",
         body: user,
       }),
-      transformResponse: (response) => {
-        return { id: response.name };
-      },
     }),
     updateUser: builder.mutation({
-      query: ({ id, ...patch }) => ({
-        url: `users/${id}.json`,
+      query: ({ userId, token, ...patch }) => ({
+        url: `users/${userId}.json?auth=${token}`,
         method: "PATCH",
         body: patch,
       }),
-      async onQueryStarted({ id, ...patch }, { dispatch, queryFulfilled }) {
+      async onQueryStarted(
+        { userId, token, ...patch },
+        { dispatch, queryFulfilled },
+      ) {
         const patchResult = dispatch(
-          userApi.util.updateQueryData("getUserById", id, (draft) => {
-            Object.assign(draft, patch);
-          }),
+          userApi.util.updateQueryData(
+            "getUserById",
+            { userId, token },
+            (draft) => {
+              Object.assign(draft, patch);
+            },
+          ),
         );
         try {
           await queryFulfilled;

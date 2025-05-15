@@ -26,8 +26,11 @@ export default function DetailsDescription({
   description,
   id,
 }: DetailsDescriptionProps) {
-  const userId = useSelector((state: RootState) => state.user.id);
-  const { data: user } = useGetUserByIdQuery(userId);
+  const { userId, token } = useSelector((state: RootState) => state.auth);
+  const { data: user } = useGetUserByIdQuery(
+    { userId: userId!, token: token! },
+    { skip: !userId || !token },
+  );
   const [updateUser] = useUpdateUserMutation();
   const isFavorite = user?.favoritesIds?.includes(id);
 
@@ -37,19 +40,22 @@ export default function DetailsDescription({
     if (isFavorite) {
       // remove fron favorites
       updateUser({
-        id: userId,
+        userId,
+        token,
         favoritesIds: user?.favoritesIds.filter((el) => el !== id),
       });
     } else if (user?.favoritesIds) {
       // add to existing favorites
       updateUser({
-        id: userId,
-        shoesIds: [...user.favoritesIds, id],
+        userId,
+        token,
+        favoritesIds: [...user.favoritesIds, id],
       });
     } else {
       // create document with first favorite item
       updateUser({
-        id: userId,
+        userId,
+        token,
         favoritesIds: [id],
       });
     }

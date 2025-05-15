@@ -84,8 +84,12 @@ const Label = ({ shoesInCartCount, label, activeIndex, index }: LabelProps) => {
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const dispatch = useDispatch();
-  const userId = useSelector((state: RootState) => state.user.id);
-  const { data: user } = useGetUserByIdQuery(userId);
+  const { userId, token } = useSelector((state: RootState) => state.auth);
+  const { data: user } = useGetUserByIdQuery(
+    { userId: userId!, token: token! },
+    { skip: !userId || !token },
+  );
+
   const activeIndex = props.state.routes[0].state?.index || 0;
   const shoesInCartCount = user?.cart?.shoes?.length;
 

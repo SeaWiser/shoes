@@ -42,8 +42,11 @@ const originalHeight = IS_LARGE_SCREEN ? 212 : 106;
 const aspectRatio = originalWidth / originalHeight;
 
 export default function BottomTabsNavigator() {
-  const userId = useSelector((state: RootState) => state.user.id);
-  const { data: user } = useGetUserByIdQuery(userId);
+  const { userId, token } = useSelector((state: RootState) => state.auth);
+  const { data: user } = useGetUserByIdQuery(
+    { userId: userId!, token: token! },
+    { skip: !userId || !token },
+  );
   const badgeCount = user?.cart?.shoes?.length;
   const insets = useSafeAreaInsets();
   const navigation =

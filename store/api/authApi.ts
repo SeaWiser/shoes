@@ -15,11 +15,6 @@ interface AuthResponse {
   error?: string;
 }
 
-const errorMessages = {
-  EMAIL_EXISTS: "Cet email est déjà utilisé",
-  INVALID_LOGIN_CREDENTIALS: "Ces identifiants sont incorrects",
-};
-
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({ baseUrl: process.env.EXPO_PUBLIC_AUTH_URL }),
@@ -30,15 +25,6 @@ export const authApi = createApi({
         method: "POST",
         body: { email, password, returnSecureToken: true },
       }),
-      transformErrorResponse: (response: any) => {
-        const code = response?.data?.error?.message as string;
-        console.log(response);
-        return {
-          error:
-            errorMessages[code as keyof typeof errorMessages] ||
-            "Une erreur est survenue. Veuillez ré-essayer ultérieurement",
-        };
-      },
     }),
     refreshToken: builder.mutation<
       { access_token: string; expires_in: string; token_type: string },

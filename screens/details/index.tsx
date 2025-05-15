@@ -25,8 +25,11 @@ type DetailsProps = {
 };
 
 export default function Details({ route, navigation }: DetailsProps) {
-  const userId = useSelector((state: RootState) => state.user.id);
-  const { data: user } = useGetUserByIdQuery(userId);
+  const { userId, token } = useSelector((state: RootState) => state.auth);
+  const { data: user } = useGetUserByIdQuery(
+    { userId: userId!, token: token! },
+    { skip: !userId || !token },
+  );
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
 
   const data = shoes
@@ -60,7 +63,8 @@ export default function Details({ route, navigation }: DetailsProps) {
       : item.price;
 
     updateUser({
-      id: userId,
+      userId,
+      token,
       cart: {
         shoes,
         totalAmount,

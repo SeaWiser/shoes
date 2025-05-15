@@ -17,11 +17,12 @@ import {
 } from "../../store/api/userApi";
 
 export default function Cart() {
-  const userId = useSelector((state: RootState) => state.user.id);
-  const { data: user, isLoading } = useGetUserByIdQuery(userId);
+  const { userId, token } = useSelector((state: RootState) => state.auth);
+  const { data: user } = useGetUserByIdQuery(
+    { userId: userId!, token: token! },
+    { skip: !userId || !token },
+  );
   const [updateUser] = useUpdateUserMutation();
-  // const state = useSelector((state: RootState) => state.cart);
-  // const { shoes, totalAmount } = state;
 
   const totalAmount = user?.cart?.totalAmount;
 
@@ -38,7 +39,8 @@ export default function Cart() {
     };
 
     updateUser({
-      id: userId,
+      userId,
+      token,
       cart: newCart,
     });
   };
@@ -56,7 +58,8 @@ export default function Cart() {
       newCart.totalAmount -= newCart.shoes[index].price;
     }
     updateUser({
-      id: userId,
+      userId,
+      token,
       cart: newCart,
     });
   };

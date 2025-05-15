@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { useSignMutation } from "../../store/api/authApi";
 import { AuthFormValues } from "@models/auth";
-import { setToken } from "../../store/slices/authSlice";
+import { setToken, setUserId } from "../../store/slices/authSlice";
 
 type LoginProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Login">;
@@ -31,6 +31,7 @@ export default function Login({ navigation }: LoginProps) {
   useEffect(() => {
     if (data) {
       dispatch(setToken(data.idToken));
+      dispatch(setUserId(data.localId));
     }
   }, [data]);
 

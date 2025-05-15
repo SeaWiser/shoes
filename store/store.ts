@@ -6,7 +6,6 @@ import cartReducer from "./slices/cartSlice";
 import { favoritesApi } from "./api/favoritesApi";
 import { notificationsApi } from "./api/notificationsApi";
 import { userApi } from "./api/userApi";
-import userReducer from "./slices/userSlice";
 import { rtkQueryErrorMiddleware } from "./middlewares/errorMiddleware";
 import errorReducer from "./slices/errorSlice";
 import authReducer from "./slices/authSlice";
@@ -17,7 +16,6 @@ export const store = configureStore({
     favorites: favoritesReducer,
     notifications: notificationsReducer,
     cart: cartReducer,
-    user: userReducer,
     error: errorReducer,
     auth: authReducer,
     [favoritesApi.reducerPath]: favoritesApi.reducer,

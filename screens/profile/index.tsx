@@ -10,13 +10,17 @@ import ProfileForm from "@screens/profile/components/ProfileForm";
 import { FormikValues } from "formik";
 
 export default function Profile() {
-  const userId = useSelector((state: RootState) => state.user.id);
-  const { data: user, isLoading } = useGetUserByIdQuery(userId);
+  const { userId, token } = useSelector((state: RootState) => state.auth);
+  const { data: user, isLoading } = useGetUserByIdQuery(
+    { userId: userId!, token: token! },
+    { skip: !userId || !token },
+  );
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
 
   const updateUserProfile = (values: FormikValues) => {
     updateUser({
-      id: userId,
+      userId,
+      token,
       ...values,
     });
   };

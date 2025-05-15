@@ -21,8 +21,11 @@ type NotificationsProps = {
 };
 
 export default function Notifications({ navigation }: NotificationsProps) {
-  const userId = useSelector((state: RootState) => state.user.id);
-  const { data: user, isLoading } = useGetUserByIdQuery(userId);
+  const { userId, token } = useSelector((state: RootState) => state.auth);
+  const { data: user, isLoading } = useGetUserByIdQuery(
+    { userId: userId!, token: token! },
+    { skip: !userId || !token },
+  );
   const [updateUser] = useUpdateUserMutation();
 
   const data = ids
@@ -39,12 +42,14 @@ export default function Notifications({ navigation }: NotificationsProps) {
   const updateNotif = (id: string) => {
     if (user?.seenNotifsIds) {
       updateUser({
-        id: userId,
+        userId,
+        token,
         seenNotifsIds: [...user.seenNotifsIds, id],
       });
     } else {
       updateUser({
-        id: userId,
+        userId,
+        token,
         seenNotifsIds: [id],
       });
     }
