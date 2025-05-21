@@ -22,6 +22,7 @@ import { RootState } from "../store/store";
 import { useGetUserByIdQuery } from "../store/api/userApi";
 import { setToken } from "../store/slices/authSlice";
 import * as SecureStore from "expo-secure-store";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 type LabelProps = {
   shoesInCartCount: number | undefined;
@@ -102,12 +103,18 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
   return (
     <DrawerContentScrollView>
       <View style={styles.userInfosContainer}>
-        <Image
-          source={{ uri: "https://picsum.photos/seed/picsum/200/300" }}
-          style={styles.image}
-          resizeMode="cover"
-        />
-        <TextBoldXL style={styles.text}>John Doe</TextBoldXL>
+        <View style={styles.imageContainer}>
+          {user?.photoUrl ? (
+            <Image
+              source={{ uri: user.photoUrl }}
+              style={styles.image}
+              resizeMode="cover"
+            />
+          ) : (
+            <FontAwesome name="user-circle" size={90} color={colors.BLUE} />
+          )}
+        </View>
+        <TextBoldXL style={styles.text}>{user?.fullName}</TextBoldXL>
       </View>
       {routes.map((route) => (
         <DrawerItem
@@ -167,6 +174,10 @@ const styles = StyleSheet.create({
   userInfosContainer: {
     marginLeft: spaces.L,
     marginVertical: spaces.XL,
+  },
+  imageContainer: {
+    width: 90,
+    height: 90,
   },
   image: {
     width: 90,

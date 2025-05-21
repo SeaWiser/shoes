@@ -1,9 +1,11 @@
-const { getDefaultConfig } = require("expo/metro-config");
+const {getDefaultConfig} = require("expo/metro-config");
 
 module.exports = (() => {
   const config = getDefaultConfig(__dirname);
+  config.resolver.sourceExts.push('cjs');
+  config.resolver.unstable_enablePackageExports = false;
 
-  const { transformer, resolver } = config;
+  const {transformer, resolver} = config;
 
   config.transformer = {
     ...transformer,
@@ -14,8 +16,6 @@ module.exports = (() => {
     assetExts: resolver.assetExts.filter((ext) => ext !== "svg"),
     sourceExts: [...resolver.sourceExts, "svg"],
   };
-
-  config.resolver.unstable_enablePackageExports = false;
 
   return config;
 })();

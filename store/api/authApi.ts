@@ -15,7 +15,7 @@ interface AuthResponse {
   error?: string;
 }
 
-interface RefreshTokenResponse {
+export interface RefreshTokenResponse {
   expires_in: string;
   token_type: string;
   refresh_token: string;

@@ -1,5 +1,8 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import { User } from "@models/user";
+import { baseQueryWithReauth } from "./baseQueryWithReauth";
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 
 interface UsersResponse {
   [key: string]: Omit<User, "id">;
@@ -7,11 +10,11 @@ interface UsersResponse {
 
 export const userApi = createApi({
   reducerPath: "userApi",
-  baseQuery: fetchBaseQuery({ baseUrl: process.env.EXPO_PUBLIC_API_URL }),
+  baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
     getUser: builder.query<User, { email: string }>({
       query: () => "users.json",
-      transformResponse: (response: UsersResponse, meta, { email }) => {
+      transformResponse: (response: UsersResponse, meta, {email}) => {
         let user = {} as User;
         for (const key in response) {
           if (response[key].email === email) {
@@ -25,29 +28,31 @@ export const userApi = createApi({
       },
     }),
     getUserById: builder.query<User, { userId: string; token: string }>({
-      query: ({ userId, token }) => `users/${userId}.json?auth=${token}`,
+      query: ({userId, token}) => ({
+        url: `users/${userId}.json?auth=${token}`,
+      }),
     }),
     createUser: builder.mutation({
-      query: ({ user, token, id }) => ({
+      query: ({user, token, id}) => ({
         url: `users/${id}.json?auth=${token}`,
         method: "PUT",
         body: user,
       }),
     }),
     updateUser: builder.mutation({
-      query: ({ userId, token, ...patch }) => ({
+      query: ({userId, token, ...patch}) => ({
         url: `users/${userId}.json?auth=${token}`,
         method: "PATCH",
         body: patch,
       }),
       async onQueryStarted(
-        { userId, token, ...patch },
-        { dispatch, queryFulfilled },
+        {userId, token, ...patch},
+        {dispatch, queryFulfilled},
       ) {
         const patchResult = dispatch(
           userApi.util.updateQueryData(
             "getUserById",
-            { userId, token },
+            {userId, token},
             (draft) => {
               Object.assign(draft, patch);
             },
@@ -60,6 +65,29 @@ export const userApi = createApi({
         }
       },
     }),
+    uploadUserPicture: builder.mutation({
+      queryFn: async ({uri, userId}) => {
+        try {
+          const storage = getStorage();
+          const imageRef = ref(storage, "images/" + userId + ".jpg");
+          const response = await fetch(uri);
+          const blobFile = await response.blob();
+          const data = await uploadBytesResumable(imageRef, blobFile);
+          const url = await getDownloadURL(data.ref);
+
+          return {
+            data: url,
+          }
+        } catch (error) {
+          return {
+            error: {
+              status: 'CUSTOM_ERROR',
+              error: error instanceof Error ? error.message : 'Unknown error'
+            } as FetchBaseQueryError
+          }
+        }
+      }
+    })
   }),
 });
 
@@ -69,4 +97,5 @@ export const {
   useUpdateUserMutation,
   useCreateUserMutation,
   useLazyGetUserQuery,
+  useUploadUserPictureMutation,
 } = userApi;

@@ -9,6 +9,7 @@ export interface User {
   favoritesIds: string[];
   seenNotifsIds: string[];
   cart: Cart;
+  photoUrl?: string;
 }
 
 export interface UserFormValues {

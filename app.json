@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "project-shoes-v2",
-    "slug": "project-shoes-v2",
+    "name": "project-shoes",
+    "slug": "project-shoes",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,7 +19,7 @@
           "NSAllowsArbitraryLoads": true
         }
       },
-      "bundleIdentifier": "com.yanis52535.projectshoesv2"
+      "bundleIdentifier": "com.yanis52535.projectshoes"
     },
     "android": {
       "adaptiveIcon": {
@@ -27,13 +27,19 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.yanis52535.projectshoesv2"
+      "package": "com.yanis52535.projectshoes"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
     ]
   }
 }

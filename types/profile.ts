@@ -5,3 +5,8 @@ export interface Profile {
   avatar_url?: string;
   updated_at: string;
 }
+
+export interface ProfileImage {
+  uri: string | undefined;
+  new: boolean;
+}
