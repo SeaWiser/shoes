@@ -8,8 +8,8 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
+      "image": "./assets/splash/splash-screen.png",
+      "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
     "ios": {
@@ -27,7 +27,10 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.yanis52535.projectshoes"
+      "package": "com.yanis52535.projectshoes",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -39,7 +42,19 @@
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
-      ]
-    ]
+      ],
+      [
+        "@react-native-firebase/crashlytics",
+        {
+          "crashlytics_auto_collection_enabled": true
+        }
+      ],
+      "expo-notifications"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "88c9269f-3dcb-4f10-9011-7e2429d7ee72"
+      }
+    }
   }
 }

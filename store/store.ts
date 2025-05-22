@@ -10,6 +10,7 @@ import { rtkQueryErrorMiddleware } from "./middlewares/errorMiddleware";
 import errorReducer from "./slices/errorSlice";
 import authReducer from "./slices/authSlice";
 import { authApi } from "./api/authApi";
+import { stripeApi } from "./api/stripe";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     [notificationsApi.reducerPath]: notificationsApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
+    [stripeApi.reducerPath]: stripeApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -29,7 +31,8 @@ export const store = configureStore({
       .concat(notificationsApi.middleware)
       .concat(userApi.middleware)
       .concat(rtkQueryErrorMiddleware)
-      .concat(authApi.middleware),
+      .concat(authApi.middleware)
+      .concat(stripeApi.middleware),
   enhancers: (getDefaultEnhancer) =>
     getDefaultEnhancer().concat(reactotron.createEnhancer()),
 });

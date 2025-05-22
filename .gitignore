@@ -1,6 +1,4 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
-# dependencies
+# Dependencies
 node_modules/
 
 # Expo
@@ -9,19 +7,19 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
+.easignore
 
 # Firebase
 ios/GoogleService-Info.plist
+ios/projectshoes/GoogleService-Info.plist
 android/app/google-services.json
 
-# Native - iOS
+# Native builds
 ios/build/
 ios/Pods/
 ios/.xcworkspace/
 ios/*.xcodeproj/project.xcworkspace/
 ios/*.xcodeproj/xcuserdata/
-
-# Native - Android
 android/.gradle/
 android/.idea/
 android/local.properties
@@ -32,16 +30,17 @@ android/build/
 # Metro
 .metro-health-check*
 
-# debug
+# Logs & debug
 npm-debug.*
 yarn-debug.*
 yarn-error.*
+*.log
 
-# macOS
-.DS_Store
-*.pem
+# Environment
+.env*
+!.env.example
 
-# Keys / sensitive
+# Keys & certificates
 *.orig.*
 *.jks
 *.p8
@@ -49,18 +48,24 @@ yarn-error.*
 *.key
 *.keystore
 *.mobileprovision
+*.pem
 credentials.json
+credentials/
 
-# local env files
-.env*.local
-.env
+# OS files
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
 
-# typescript
+# TypeScript
 *.tsbuildinfo
 
 # IDE
 .vscode/
 *.swp
 *.swo
-*.tmp
-.env
+
+# React Native
+.react-native-cli
+.flipper/

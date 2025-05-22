@@ -11,9 +11,11 @@ platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
 install! 'cocoapods',
   :deterministic_uuids => false
 
+use_frameworks! :linkage => :static
+
 prepare_react_native_project!
 
-target 'projectshoesv2' do
+target 'projectshoes' do
   use_expo_modules!
 
   if ENV['EXPO_USE_COMMUNITY_AUTOLINKING'] == '1'

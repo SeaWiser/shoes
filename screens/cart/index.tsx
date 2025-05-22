@@ -8,21 +8,49 @@ import ListItem from "@screens/cart/components/ListItem";
 import TextBoldL from "@ui-components/texts/TextBoldL";
 import TextBoldXL from "@ui-components/texts/TextBoldXL";
 import { radius } from "@constants/radius";
-import CustomButton from "@ui-components/buttons/CustomButton";
 import DashedLine from "@ui-components/separators/DashedLine";
 import { IS_LARGE_SCREEN } from "@constants/sizes";
 import {
   useGetUserByIdQuery,
   useUpdateUserMutation,
 } from "../../store/api/userApi";
+import { useFetchPublishableKeyQuery } from "../../store/api/stripe";
+import { useEffect, useState } from "react";
+import { initStripe } from "@stripe/stripe-react-native";
+import PaymentButton from "@screens/cart/components/PaymentButton";
+import PaymentSuccess from "@screens/cart/components/PaymentSuccess";
 
 export default function Cart() {
+  const [isPaymentDone, setIsPaymentDone] = useState(false);
   const { userId, token } = useSelector((state: RootState) => state.auth);
   const { data: user } = useGetUserByIdQuery(
     { userId: userId!, token: token! },
     { skip: !userId || !token },
   );
   const [updateUser] = useUpdateUserMutation();
+  const [isStripeInitialized, setIsStripeInitialized] = useState(false);
+
+  const { data, isLoading } = useFetchPublishableKeyQuery();
+
+  useEffect(() => {
+    if (data?.publishableKey) {
+      initStripe({ publishableKey: data.publishableKey }).then(() =>
+        setIsStripeInitialized(true),
+      );
+    }
+  }, [data]);
+
+  const resetCart = () => {
+    setIsPaymentDone(false);
+    updateUser({
+      userId,
+      token,
+      cart: {
+        shoes: [],
+        totalAmount: 0,
+      },
+    });
+  };
 
   const totalAmount = user?.cart?.totalAmount;
 
@@ -107,11 +135,12 @@ export default function Cart() {
             {totalAmount + Math.floor(totalAmount / 15)} €
           </TextBoldXL>
         </View>
-        <CustomButton
-          text="Passer la commande"
-          onPress={() => console.log}
-        ></CustomButton>
+        <PaymentButton
+          isReady={isStripeInitialized}
+          setIsPaymentDone={setIsPaymentDone}
+        />
       </View>
+      {isPaymentDone ? <PaymentSuccess onPress={resetCart} /> : null}
     </View>
   );
 }

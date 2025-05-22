@@ -23,6 +23,7 @@ import { useGetUserByIdQuery } from "../store/api/userApi";
 import { setToken } from "../store/slices/authSlice";
 import * as SecureStore from "expo-secure-store";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { useNotifications } from "@utils/notifications";
 
 type LabelProps = {
   shoesInCartCount: number | undefined;
@@ -47,6 +48,9 @@ const routes = [
 ];
 
 export default function DrawerNavigator() {
+  const { expoPushToken } = useNotifications();
+  console.log("expoPushToken: ", expoPushToken);
+
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}

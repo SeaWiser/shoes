@@ -1,5 +1,5 @@
 if (__DEV__) require("./ReactotronConfig");
-import 'react-native-url-polyfill/auto';
+import "react-native-url-polyfill/auto";
 import { store } from "./store/store";
 import { Provider } from "react-redux";
 import "react-native-gesture-handler";
@@ -15,6 +15,7 @@ export default function App() {
   if (apps.length === 0) {
     initializeApp(firebaseConfig);
   }
+
   const [fontsLoaded] = useFonts({
     Light: require("./assets/fonts/Montserrat-Light.ttf"),
     Regular: require("./assets/fonts/Montserrat-Regular.ttf"),
@@ -26,7 +27,7 @@ export default function App() {
     <Provider store={store}>
       <SafeAreaProvider>
         <NavigationContainer>
-          <MainStackNavigator/>
+          <MainStackNavigator />
         </NavigationContainer>
       </SafeAreaProvider>
     </Provider>
