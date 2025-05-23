@@ -29,7 +29,6 @@ export default function Favorites({ navigation }: ListProps) {
     { userId: userId!, token: token! },
     { skip: !userId || !token },
   );
-  console.log({ userId, user });
 
   const data = user?.favoritesIds?.map((id) =>
     shoes

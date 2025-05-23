@@ -29,7 +29,6 @@ export default function VerticalCard({
   isFavorite = false,
 }: VerticalCardProps) {
   const itemColors = item.items.map((elem) => elem.color);
-  console.log(itemColors);
   return (
     <View style={styles.container}>
       <Touchable onPress={onPress}>

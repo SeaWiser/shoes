@@ -32,7 +32,6 @@ export const notificationsApi = createApi({
       }),
       async onQueryStarted(notificationId, { dispatch, queryFulfilled }) {
         try {
-          console.log("add first notification");
           const { data } = await queryFulfilled;
           dispatch(
             notificationsApi.util.upsertQueryData(

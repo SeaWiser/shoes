@@ -50,9 +50,9 @@ export const useNotifications = () => {
   >();
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then((token) =>
-      setExpoPushToken(token),
-    );
+    registerForPushNotificationsAsync().then((token) => {
+      setExpoPushToken(token);
+    });
   }, []);
 
   useEffect(() => {
@@ -67,6 +67,8 @@ export const useNotifications = () => {
       trigger: {
         seconds: 3,
       } as NotificationTriggerInput,
+    }).then((result) => {
+      console.log("token in notifications: ", result);
     });
   }, []);
 

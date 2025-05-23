@@ -19,7 +19,8 @@
           "NSAllowsArbitraryLoads": true
         }
       },
-      "bundleIdentifier": "com.yanis52535.projectshoes"
+      "bundleIdentifier": "com.yanis52535.projectshoes",
+      "googleServicesFile": "./ios/GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -28,6 +29,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.yanis52535.projectshoes",
+      "googleServicesFile": "./android/app/google-services.json",
       "permissions": [
         "android.permission.RECORD_AUDIO"
       ]

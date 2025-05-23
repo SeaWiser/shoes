@@ -20,7 +20,6 @@ interface ErrorPayload {
 
 export const rtkQueryErrorMiddleware: Middleware =
   (api: MiddlewareAPI) => (next) => (action: any) => {
-    console.log(action.payload);
     if (isRejectedWithValue(action)) {
       const payload = action.payload as ErrorPayload;
       const code = payload?.data?.error?.message;
