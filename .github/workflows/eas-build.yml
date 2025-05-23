@@ -50,8 +50,8 @@ jobs:
       - name: ⚙️ Setup Expo & EAS
         uses: expo/expo-github-action@v8
         with:
-          expo-version: 6.3.2
-          eas-version: 3.16.2
+          expo-version: latest
+          eas-version: latest
           token: ${{ secrets.EAS_ACCESS_TOKEN }}
 
       - name: 📦 Install dependencies
