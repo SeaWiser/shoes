@@ -21,7 +21,11 @@
     "@stripe/stripe-react-native": "0.45.0",
     "@supabase/supabase-js": "^2.49.4",
     "expo": "~53.0.9",
+    "expo-constants": "~17.1.6",
+    "expo-dev-client": "~5.1.8",
+    "expo-device": "~7.1.4",
     "expo-image-picker": "~16.1.4",
+    "expo-notifications": "~0.31.2",
     "expo-secure-store": "~14.2.3",
     "expo-status-bar": "~2.2.3",
     "firebase": "^11.8.0",
@@ -39,17 +43,14 @@
     "react-native-url-polyfill": "^2.0.0",
     "react-redux": "^9.2.0",
     "reactotron-redux": "^3.2.0",
-    "yup": "^1.6.1",
-    "expo-notifications": "~0.31.2",
-    "expo-device": "~7.1.4",
-    "expo-constants": "~17.1.6",
-    "expo-dev-client": "~5.1.8"
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/firebase": "^2.4.32",
     "@types/react": "~19.0.10",
     "babel-plugin-module-resolver": "^5.0.2",
+    "eas-cli": "^16.6.2",
     "reactotron-react-native": "^5.1.13",
     "typescript": "~5.8.3"
   },
