@@ -55,7 +55,30 @@ jobs:
 
       - name: 🔧 Setup Firebase config
         run: |
+          # Vérifier que le secret existe
+          if [ -z "${{ secrets.GOOGLE_SERVICES_JSON }}" ]; then
+            echo "❌ GOOGLE_SERVICES_JSON secret is not set!"
+            exit 1
+          fi
+          
+          # Créer les dossiers nécessaires
+          mkdir -p android/app/src/release
+          mkdir -p android/app/src
+          
+          # Créer le fichier dans tous les emplacements possibles
           echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/src/google-services.json
+          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/src/release/google-services.json
+          
+          # Vérifier que les fichiers existent et ne sont pas vides
+          echo "✅ Checking google-services.json files:"
+          ls -la android/app/google-services.json
+          ls -la android/app/src/google-services.json
+          ls -la android/app/src/release/google-services.json
+          
+          # Vérifier le contenu (premières lignes seulement)
+          echo "📄 First lines of google-services.json:"
+          head -3 android/app/google-services.json
 
       - name: 🔍 Verify EAS configuration
         run: |
