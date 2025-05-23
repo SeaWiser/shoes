@@ -53,6 +53,10 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci
 
+      - name: 🔧 Setup Firebase config
+        run: |
+          echo '${{ secrets.GOOGLE_SERVICES_JSON }}' > android/app/google-services.json
+
       - name: 🔍 Verify EAS configuration
         run: |
           echo "Checking EAS configuration..."
