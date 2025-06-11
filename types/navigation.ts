@@ -14,12 +14,15 @@ export type RootStackParamList = {
 };
 
 export type MainStackParamList = {
-  BottomTabs: undefined;
+  Login: undefined;
+  Signup: undefined;
+  Drawer: undefined;
   Details: {
     id: string;
   };
-  Drawer: undefined;
   MainCart: undefined;
-  Signup: undefined;
-  Login: undefined;
+  List: {
+    brand: string;
+  };
+  NewsList: undefined;
 };

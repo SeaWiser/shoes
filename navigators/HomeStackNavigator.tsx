@@ -32,6 +32,7 @@ export default function HomeStackNavigator() {
         name="Home"
         component={HomeScreen}
         options={({ navigation }) => ({
+          headerShown: false,
           title: "Shoes",
           headerLeft: () => {
             const parentNavigation = navigation

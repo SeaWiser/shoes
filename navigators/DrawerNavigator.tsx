@@ -58,8 +58,12 @@ export default function DrawerNavigator() {
         popToTopOnBlur: true,
         drawerStyle: {
           backgroundColor: colors.DARK,
+          width: "70%",
         },
-        overlayColor: colors.DARK,
+        overlayColor: "transparent",
+        sceneStyle: {
+          backgroundColor: colors.DARK,
+        },
         headerShown: false,
       }}
     >
