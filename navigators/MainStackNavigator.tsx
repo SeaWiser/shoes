@@ -21,7 +21,8 @@ import SplashScreen from "@screens/splashScreen";
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
 export default function MainStackNavigator() {
-  const [refreshTokenMutation, { data }] = useRefreshTokenMutation();
+  const [refreshTokenMutation, { data, isError, error }] =
+    useRefreshTokenMutation();
   const token = useSelector((state: RootState) => state.auth.token);
   const [isLoading, setIsLoading] = useState(!token);
   const [isAppReady, setIsAppReady] = useState(false);
@@ -55,6 +56,16 @@ export default function MainStackNavigator() {
       setIsLoading(false);
     }
   }, [data]);
+
+  // Ajouter une gestion d'erreur pour la mutation de rafraîchissement du token
+  useEffect(() => {
+    if (isError) {
+      console.error("Erreur de rafraîchissement du token:", error);
+      // En cas d'erreur, on nettoie le token et on arrête le chargement
+      SecureStore.deleteItemAsync("refreshToken");
+      setIsLoading(false);
+    }
+  }, [isError, error]);
 
   const appReadyHandler = () => {
     setIsAppReady(true);

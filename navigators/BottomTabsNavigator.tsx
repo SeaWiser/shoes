@@ -5,7 +5,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import {
+  BottomTabNavigationOptions,
+  BottomTabNavigationProp,
+  createBottomTabNavigator,
+} from "@react-navigation/bottom-tabs";
 import HomeStackNavigator from "@navigators/HomeStackNavigator";
 import Favorites from "@screens/favorites";
 import Cart from "@screens/cart";
@@ -34,6 +38,7 @@ import { ParamListBase, useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useGetUserByIdQuery } from "../store/api/userApi";
+import { RootStackParamList } from "@models/navigation";
 
 const Tabs = createBottomTabNavigator();
 
@@ -49,68 +54,72 @@ export default function BottomTabsNavigator() {
   );
   const badgeCount = user?.cart?.shoes?.length;
   const insets = useSafeAreaInsets();
-  const navigation =
-    useNavigation<DrawerNavigationProp<{ MainCart: undefined }>>();
+  const navigation = useNavigation<DrawerNavigationProp<RootStackParamList>>();
+
+  const getTabScreenOptions = ({
+    navigation,
+  }: {
+    navigation: BottomTabNavigationProp<ParamListBase>;
+  }): BottomTabNavigationOptions => ({
+    popToTopOnBlur: true,
+    tabBarStyle: {
+      height: 70,
+      backgroundColor: colors.LIGHT,
+      borderTopWidth: 0,
+      elevation: 0,
+    },
+    headerStyle: {
+      backgroundColor: colors.LIGHT,
+    },
+    headerShadowVisible: false,
+    tabBarIconStyle: {
+      top: "50%",
+      transform: [{ translateY: -SMALL_ICON_SIZE / 2 }],
+    },
+    tabBarButton: (props: any) => (
+      <TouchableOpacity
+        {...filterTouchableOpacityProps(props)}
+        activeOpacity={1}
+      />
+    ),
+    tabBarShowLabel: false,
+    tabBarActiveTintColor: colors.BLUE,
+    tabBarInactiveTintColor: colors.GREY,
+    tabBarBackground: () => (
+      <View style={{ aspectRatio }}>
+        <BottomTabsBackground
+          width={SCREEN_WIDTH}
+          height={"100%"}
+          viewBox={`0 0 ${originalWidth} ${originalHeight}`}
+        />
+      </View>
+    ),
+    headerTitleAlign: "center" as const,
+    headerLeft: () => {
+      const parentNavigation =
+        navigation.getParent<DrawerNavigationProp<ParamListBase>>();
+
+      return (
+        <Pressable
+          style={styles.drawerIconContainer}
+          onPress={() => parentNavigation?.openDrawer()}
+        >
+          <DrawerIcon />
+        </Pressable>
+      );
+    },
+  });
 
   return (
     <View
       style={{
         flex: 1,
-        paddingBottom: insets.bottom,
         backgroundColor: colors.WHITE,
       }}
     >
       <Tabs.Navigator
-        screenOptions={({ navigation }) => ({
-          popToTopOnBlur: true,
-          tabBarStyle: {
-            height: originalHeight,
-            backgroundColor: colors.LIGHT,
-            paddingTop: insets.bottom + 20,
-            borderTopWidth: 0,
-            elevation: 0,
-          },
-          headerStyle: {
-            backgroundColor: colors.LIGHT,
-          },
-          headerShadowVisible: false,
-          tabBarIconStyle: {
-            top: "50%",
-            transform: [{ translateY: -SMALL_ICON_SIZE / 2 }],
-          },
-          tabBarButton: (props) => (
-            <TouchableOpacity
-              {...filterTouchableOpacityProps(props)}
-              activeOpacity={1}
-            />
-          ),
-          tabBarShowLabel: false,
-          tabBarActiveTintColor: colors.BLUE,
-          tabBarInactiveTintColor: colors.GREY,
-          tabBarBackground: () => (
-            <View style={{ aspectRatio }}>
-              <BottomTabsBackground
-                width={SCREEN_WIDTH}
-                height={"100%"}
-                viewBox={`0 0 ${originalWidth} ${originalHeight}`}
-              />
-            </View>
-          ),
-          headerTitleAlign: "center",
-          headerLeft: () => {
-            const parentNavigation =
-              navigation.getParent<DrawerNavigationProp<ParamListBase>>();
-
-            return (
-              <Pressable
-                style={styles.drawerIconContainer}
-                onPress={() => parentNavigation?.openDrawer()}
-              >
-                <DrawerIcon />
-              </Pressable>
-            );
-          },
-        })}
+        initialRouteName="HomeStack"
+        screenOptions={({ navigation }) => getTabScreenOptions({ navigation })}
       >
         <Tabs.Screen
           name="HomeStack"

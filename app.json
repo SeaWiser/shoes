@@ -2,6 +2,7 @@
   "expo": {
     "name": "project-shoes",
     "slug": "project-shoes",
+    "scheme": "project-shoes",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

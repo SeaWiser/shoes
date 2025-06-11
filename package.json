@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "eas-build-pre-install": "npx ts-node --project tsconfig.json scripts/setup-google-services.ts"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "2.1.2",
@@ -22,22 +23,26 @@
     "@supabase/supabase-js": "^2.49.4",
     "expo": "~53.0.9",
     "expo-constants": "~17.1.6",
-    "expo-dev-client": "~5.1.8",
+    "expo-dev-client": "~5.2.0",
     "expo-device": "~7.1.4",
     "expo-image-picker": "~16.1.4",
+    "expo-linear-gradient": "~14.1.5",
+    "expo-linking": "~7.1.5",
     "expo-notifications": "~0.31.2",
     "expo-secure-store": "~14.2.3",
     "expo-status-bar": "~2.2.3",
     "firebase": "^11.8.0",
     "formik": "^2.4.6",
     "lottie-react-native": "7.2.2",
+    "moti": "^0.30.0",
     "prettier": "^3.5.3",
     "react": "19.0.0",
-    "react-native": "0.79.2",
+    "react-native": "0.79.3",
+    "react-native-drawer-layout": "^4.1.10",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
-    "react-native-screens": "~4.10.0",
+    "react-native-screens": "~4.11.1",
     "react-native-svg": "15.11.2",
     "react-native-svg-transformer": "^1.5.1",
     "react-native-url-polyfill": "^2.0.0",
@@ -48,11 +53,35 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/firebase": "^2.4.32",
+    "@types/node": "^22.15.21",
     "@types/react": "~19.0.10",
     "babel-plugin-module-resolver": "^5.0.2",
-    "eas-cli": "^16.6.2",
+    "eas-cli": "^16.9.0",
     "reactotron-react-native": "^5.1.13",
+    "ts-node": "^10.9.2",
     "typescript": "~5.8.3"
+  },
+  "overrides": {
+    "@expo/config-plugins": "~10.0.0",
+    "@expo/prebuild-config": "~9.0.0",
+    "react": "19.0.0",
+    "@types/react": "~19.0.10",
+    "moti": {
+      "react": "19.0.0"
+    }
+  },
+  "resolutions": {
+    "react": "19.0.0",
+    "@types/react": "~19.0.10",
+    "**/react": "19.0.0",
+    "moti/react": "19.0.0"
+  },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "listUnknownPackages": false
+      }
+    }
   },
   "private": true
 }

@@ -11,6 +11,7 @@
 		0939991E2DDE9B4500C4E566 /* GoogleService-info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0939991D2DDE9B4500C4E566 /* GoogleService-info.plist */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
+		6CFF50EED87943D4A65DEF17 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5825443FDB4644FC8AB97C22 /* GoogleService-Info.plist */; };
 		92AEC9D2F2BF89070F9C6C5E /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417B514795D3B6C8B5B2764A /* ExpoModulesProvider.swift */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		C358C320A26202D3D3E8CA69 /* Pods_projectshoes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84522CB33268BC170EDC0C36 /* Pods_projectshoes.framework */; };
@@ -24,6 +25,7 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = projectshoes/Info.plist; sourceTree = "<group>"; };
 		2496A5DAA9D41F678A5EEE35 /* Pods-projectshoes.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-projectshoes.debug.xcconfig"; path = "Target Support Files/Pods-projectshoes/Pods-projectshoes.debug.xcconfig"; sourceTree = "<group>"; };
 		417B514795D3B6C8B5B2764A /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-projectshoes/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		5825443FDB4644FC8AB97C22 /* GoogleService-Info.plist */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "projectshoes/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		84522CB33268BC170EDC0C36 /* Pods_projectshoes.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_projectshoes.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		87F5748143E95414C4B34328 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = projectshoes/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = projectshoes/SplashScreen.storyboard; sourceTree = "<group>"; };
@@ -57,6 +59,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
 				87F5748143E95414C4B34328 /* PrivacyInfo.xcprivacy */,
+				5825443FDB4644FC8AB97C22 /* GoogleService-Info.plist */,
 			);
 			name = projectshoes;
 			sourceTree = "<group>";
@@ -202,6 +205,7 @@
 				0939991E2DDE9B4500C4E566 /* GoogleService-info.plist in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				02856016D3B84098FEBB9F48 /* PrivacyInfo.xcprivacy in Resources */,
+				6CFF50EED87943D4A65DEF17 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -323,6 +327,8 @@
 				"${PODS_CONFIGURATION_BUILD_DIR}/StripePaymentsUI/StripePaymentsUIBundle.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/StripeUICore/StripeUICoreBundle.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/boost/boost_privacy.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/expo-dev-launcher/EXDevLauncher.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/expo-dev-menu/EXDevMenu.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/glog/glog_privacy.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/lottie-ios/LottiePrivacyInfo.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/lottie-react-native/Lottie_React_Native_Privacy.bundle",
@@ -359,6 +365,8 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/StripePaymentsUIBundle.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/StripeUICoreBundle.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/boost_privacy.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXDevLauncher.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EXDevMenu.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/glog_privacy.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/LottiePrivacyInfo.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Lottie_React_Native_Privacy.bundle",

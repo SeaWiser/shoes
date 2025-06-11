@@ -53,7 +53,11 @@ export default function ProfileForm({
         contentContainerStyle={styles.formContainer}
         showsVerticalScrollIndicator={false}
       >
-        <ProfilePicture image={image} setImage={setImage} />
+        <ProfilePicture
+          image={image}
+          setImage={setImage}
+          photoUrl={user?.photoUrl}
+        />
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}

@@ -18,6 +18,7 @@ import {
   useGetUserByIdQuery,
   useUpdateUserMutation,
 } from "../../store/api/userApi";
+import AnimatedHeader from "@screens/details/components/AnimatedHeader";
 
 type DetailsProps = {
   route: RouteProp<RootStackParamList, "Details">;
@@ -25,6 +26,7 @@ type DetailsProps = {
 };
 
 export default function Details({ route, navigation }: DetailsProps) {
+  const [shouldAnimate, setShouldAnimate] = useState<boolean>(false);
   const { userId, token } = useSelector((state: RootState) => state.auth);
   const { data: user } = useGetUserByIdQuery(
     { userId: userId!, token: token! },
@@ -46,6 +48,7 @@ export default function Details({ route, navigation }: DetailsProps) {
   const [sizes, setSizes] = useState<number[] | undefined>(data.items[0].sizes);
 
   const addToCart = () => {
+    setShouldAnimate(true);
     const item = {
       id: data.id + Date.now(),
       name:
@@ -88,6 +91,11 @@ export default function Details({ route, navigation }: DetailsProps) {
   return (
     <View style={styles.mainContainer}>
       <ScrollView showsVerticalScrollIndicator={false}>
+        <AnimatedHeader
+          shouldAnimate={shouldAnimate}
+          setShouldAnimate={setShouldAnimate}
+          cartCount={user?.cart?.shoes?.length ?? 0}
+        />
         <View style={styles.container}>
           <DetailsImage source={selectedImage} />
           <DetailsDescription

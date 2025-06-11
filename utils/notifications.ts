@@ -1,5 +1,5 @@
 import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
+import { Linking, Platform } from "react-native";
 import * as Device from "expo-device";
 import Constants from "expo-constants";
 import { useEffect, useState } from "react";
@@ -34,7 +34,12 @@ const registerForPushNotificationsAsync = async () => {
     }
     const projectId =
       Constants?.expoConfig?.extra?.eas?.projectId ??
-      Constants?.easConfig?.projectId;
+      (Constants?.easConfig?.projectId as string);
+
+    if (!projectId) {
+      throw new Error("Project ID is not configured");
+    }
+
     try {
       const response = await Notifications.getExpoPushTokenAsync({ projectId });
       return response.data;
@@ -53,6 +58,16 @@ export const useNotifications = () => {
     registerForPushNotificationsAsync().then((token) => {
       setExpoPushToken(token);
     });
+
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        const url = response.notification.request.content.data.url;
+        if (typeof url === "string") {
+          Linking.openURL(url);
+        }
+      },
+    );
+    return () => subscription.remove();
   }, []);
 
   useEffect(() => {

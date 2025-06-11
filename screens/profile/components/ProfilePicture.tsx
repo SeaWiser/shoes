@@ -7,18 +7,23 @@ import { spaces } from "@constants/spaces";
 import { radius } from "@constants/radius";
 import * as ImagePicker from "expo-image-picker";
 import { ProfileImage } from "@models/profile";
+import { Skeleton } from "moti/skeleton";
+import { useState } from "react";
 
 const SIZE = 90;
 
 interface ProfilePictureProps {
   image: ProfileImage;
   setImage: (image: ProfileImage) => void;
+  photoUrl?: string;
 }
 
 export default function ProfilePicture({
   image,
   setImage,
+  photoUrl,
 }: ProfilePictureProps) {
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -33,8 +38,19 @@ export default function ProfilePicture({
   return (
     <View style={styles.container}>
       <Pressable style={styles.imageContainer} onPress={pickImage}>
-        {image?.uri ? (
-          <Image source={{ uri: image.uri }} style={styles.image} />
+        {photoUrl ? (
+          <Skeleton
+            show={!isImageLoaded}
+            width={SIZE}
+            radius={radius.FULL}
+            colorMode="light"
+          >
+            <Image
+              source={{ uri: image.uri }}
+              style={styles.image}
+              onLoadEnd={() => setIsImageLoaded(true)}
+            />
+          </Skeleton>
         ) : (
           <FontAwesome name="user-circle" size={SIZE} color={colors.BLUE} />
         )}

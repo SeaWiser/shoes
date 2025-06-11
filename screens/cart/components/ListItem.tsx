@@ -8,17 +8,28 @@ import { colors } from "@constants/colors";
 import { spaces } from "@constants/spaces";
 import { radius } from "@constants/radius";
 import { CartItem } from "@models/cart";
+import { Skeleton } from "moti/skeleton";
+
+export const SkeletonProps: {
+  colorMode: "light" | "dark" | undefined;
+  radius: number;
+} = {
+  colorMode: "light",
+  radius: radius.REGULAR,
+};
 
 type ListItemProps = {
   item: CartItem;
   removeShoesFromCart: (id: string) => void;
   updateQuantity: (id: string, increase: boolean) => void;
+  isLoading: boolean;
 };
 
 export default function ListItem({
   item,
   removeShoesFromCart,
   updateQuantity,
+  isLoading,
 }: ListItemProps) {
   const decreaseShoesQuantity = () => {
     if (item.quantity > 1) {
@@ -34,44 +45,63 @@ export default function ListItem({
 
   return (
     <View style={styles.container}>
-      <View style={styles.leftContainer}>
-        <View style={styles.imageContainer}>
-          <Image source={item.image} style={styles.image} />
-        </View>
-        <View style={styles.columnContainer}>
-          <TextBoldL>{item.name}</TextBoldL>
-          <TextBoldL>{item.price} €</TextBoldL>
-          <View style={styles.quantityContainer}>
-            <Pressable
-              style={[
-                styles.operationSignContainer,
-                styles.subtractSignContainer,
-              ]}
-              onPress={decreaseShoesQuantity}
-            >
-              <TextBoldXL style={styles.minusText}>-</TextBoldXL>
-            </Pressable>
-            <TextBoldM style={styles.quantityText}>{item.quantity}</TextBoldM>
-            <Pressable
-              style={[styles.operationSignContainer, styles.addSignContainer]}
-              onPress={increaseShoesQuantity}
-            >
-              <TextBoldXL style={styles.plusText}>+</TextBoldXL>
-            </Pressable>
+      <Skeleton.Group show={isLoading}>
+        <View style={styles.leftContainer}>
+          <Skeleton width={120} {...SkeletonProps}>
+            <View style={styles.imageContainer}>
+              <Image source={item.image} style={styles.image} />
+            </View>
+          </Skeleton>
+          <View style={styles.columnContainer}>
+            <Skeleton {...SkeletonProps}>
+              <TextBoldL>{item.name}</TextBoldL>
+            </Skeleton>
+            <Skeleton {...SkeletonProps}>
+              <TextBoldL>{item.price} €</TextBoldL>
+            </Skeleton>
+            <Skeleton {...SkeletonProps}>
+              <View style={styles.quantityContainer}>
+                <Pressable
+                  style={[
+                    styles.operationSignContainer,
+                    styles.subtractSignContainer,
+                  ]}
+                  onPress={decreaseShoesQuantity}
+                >
+                  <TextBoldXL style={styles.minusText}>-</TextBoldXL>
+                </Pressable>
+                <TextBoldM style={styles.quantityText}>
+                  {item.quantity}
+                </TextBoldM>
+                <Pressable
+                  style={[
+                    styles.operationSignContainer,
+                    styles.addSignContainer,
+                  ]}
+                  onPress={increaseShoesQuantity}
+                >
+                  <TextBoldXL style={styles.plusText}>+</TextBoldXL>
+                </Pressable>
+              </View>
+            </Skeleton>
           </View>
         </View>
-      </View>
 
-      <View style={[styles.rightContainer, styles.columnContainer]}>
-        <TextBoldL>{item.size}</TextBoldL>
-        <Feather
-          name="trash-2"
-          size={ICON_SIZE}
-          color={colors.GREY}
-          suppressHighlighting={true}
-          onPress={removeShoes}
-        />
-      </View>
+        <View style={[styles.rightContainer, styles.columnContainer]}>
+          <Skeleton {...SkeletonProps}>
+            <TextBoldL>{item.size}</TextBoldL>
+          </Skeleton>
+          <Skeleton {...SkeletonProps}>
+            <Feather
+              name="trash-2"
+              size={ICON_SIZE}
+              color={colors.GREY}
+              suppressHighlighting={true}
+              onPress={removeShoes}
+            />
+          </Skeleton>
+        </View>
+      </Skeleton.Group>
     </View>
   );
 }

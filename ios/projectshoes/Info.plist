@@ -27,7 +27,14 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
+          <string>project-shoes</string>
           <string>com.yanis52535.projectshoes</string>
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>exp+project-shoes</string>
         </array>
       </dict>
     </array>

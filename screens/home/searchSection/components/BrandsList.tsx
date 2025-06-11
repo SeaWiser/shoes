@@ -39,6 +39,7 @@ export default function BrandsList({
 const styles = StyleSheet.create({
   listContainer: {
     flexGrow: 0,
+    marginTop: spaces.M,
   },
   contentStyle: {
     justifyContent: "space-between",

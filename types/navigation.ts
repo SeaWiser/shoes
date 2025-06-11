@@ -10,6 +10,7 @@ export type RootStackParamList = {
   Login: undefined;
   Signup: undefined;
   Drawer: undefined;
+  MainCart: undefined;
 };
 
 export type MainStackParamList = {
