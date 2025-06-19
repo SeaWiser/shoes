@@ -17,13 +17,13 @@ import ProfileIcon from "@assets/images/navigation/user.svg";
 import FavoriteIcon from "@assets/images/navigation/favorite.svg";
 import CartIcon from "@assets/images/navigation/cart.svg";
 import NotificationsIcon from "@assets/images/navigation/notifications.svg";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store/store";
-import { useGetUserByIdQuery } from "../store/api/userApi";
-import { setToken } from "../store/slices/authSlice";
+import { useDispatch } from "react-redux";
+import { setToken } from "@store/slices/authSlice";
 import * as SecureStore from "expo-secure-store";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useNotifications } from "@utils/notifications";
+import { useAuth, useLogoutMutation } from "@store/api/authApi";
+import { useProfileCreation } from "@hooks/useProfileCreation";
 
 type LabelProps = {
   shoesInCartCount: number | undefined;
@@ -94,27 +94,39 @@ const Label = ({ shoesInCartCount, label, activeIndex, index }: LabelProps) => {
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const dispatch = useDispatch();
-  const { userId, token } = useSelector((state: RootState) => state.auth);
-  const { data: user } = useGetUserByIdQuery(
-    { userId: userId!, token: token! },
-    { skip: !userId || !token },
-  );
+
+  const { user: authUser } = useAuth();
+  const { appwriteUserProfile } = useProfileCreation();
+
+  const [logoutMutation] = useLogoutMutation();
 
   const activeIndex = props.state.routes[0].state?.index || 0;
-  const shoesInCartCount = user?.cart?.shoes?.length;
+  const shoesInCartCount = appwriteUserProfile?.cart?.shoes?.length;
 
-  const logout = () => {
-    dispatch(setToken(undefined));
-    SecureStore.deleteItemAsync("refreshToken");
+  const logout = async () => {
+    try {
+      // Utiliser la mutation d'Appwrite pour se déconnecter
+      await logoutMutation().unwrap();
+
+      // Nettoyer le state Redux
+      dispatch(setToken(undefined));
+
+      // Supprimer le token de refresh stocké
+      await SecureStore.deleteItemAsync("refreshToken");
+
+      console.log("Déconnexion réussie");
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion:", error);
+    }
   };
 
   return (
     <DrawerContentScrollView>
       <View style={styles.userInfosContainer}>
         <View style={styles.imageContainer}>
-          {user?.photoUrl ? (
+          {appwriteUserProfile?.photoUrl ? (
             <Image
-              source={{ uri: user.photoUrl }}
+              source={{ uri: appwriteUserProfile.photoUrl }}
               style={styles.image}
               resizeMode="cover"
             />
@@ -122,7 +134,9 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
             <FontAwesome name="user-circle" size={90} color={colors.BLUE} />
           )}
         </View>
-        <TextBoldXL style={styles.text}>{user?.fullName}</TextBoldXL>
+        <TextBoldXL style={styles.text}>
+          {appwriteUserProfile?.fullName}
+        </TextBoldXL>
       </View>
       {routes.map((route) => (
         <DrawerItem

@@ -1,9 +1,9 @@
 import {
-  View,
-  StyleSheet,
+  ActivityIndicator,
   FlatList,
   ListRenderItem,
-  ActivityIndicator,
+  StyleSheet,
+  View,
 } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { colors } from "@constants/colors";
@@ -16,25 +16,58 @@ import { IS_LARGE_SCREEN, SCREEN_HEIGHT } from "@constants/sizes";
 import VerticalCard from "@ui-components/cards/VerticalCard";
 import TextBoldL from "@ui-components/texts/TextBoldL";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import { useGetUserByIdQuery } from "../../store/api/userApi";
+import { RootState } from "@store/store";
+import { useGetUserByIdQuery } from "@store/api/userApi";
+import { useAuth } from "@store/api/authApi";
+import { useEffect } from "react";
 
-type ListProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, "List">;
+type FavoritesProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, any>;
 };
 
-export default function Favorites({ navigation }: ListProps) {
-  const { userId, token } = useSelector((state: RootState) => state.auth);
-  const { data: user, isLoading } = useGetUserByIdQuery(
-    { userId: userId!, token: token! },
-    { skip: !userId || !token },
-  );
+export default function Favorites({ navigation }: FavoritesProps) {
+  // Utilisation du hook useAuth pour une authentification plus fiable
+  const { user: authUser, isAuthenticated } = useAuth();
 
-  const data = user?.favoritesIds?.map((id) =>
-    shoes
-      .find((item) => item.stock.find((elem) => elem.id === id))
-      ?.stock.find((el) => el.id === id),
-  );
+  // Récupération du userId depuis le store Redux comme fallback
+  const { userId: reduxUserId } = useSelector((state: RootState) => state.auth);
+
+  // Utiliser l'ID de l'utilisateur authentifié en priorité, sinon utiliser celui du Redux
+  const userId = authUser?.$id || reduxUserId;
+
+  const {
+    data: user,
+    isLoading,
+    refetch,
+  } = useGetUserByIdQuery(userId!, {
+    skip: !userId,
+  });
+
+  // Forcer le rafraîchissement des données lorsque l'écran est affiché
+  useEffect(() => {
+    return navigation.addListener("focus", () => {
+      if (userId) {
+        console.log("Rafraîchissement des favoris...");
+        refetch();
+      }
+    });
+  }, [navigation, userId, refetch]);
+
+  // Mapper les IDs favoris vers les objets ShoeStock avec vérification supplémentaire
+  const favoriteShoes =
+    user?.favoriteIds && user.favoriteIds.length > 0
+      ? (user.favoriteIds
+          .map((id: string) => {
+            console.log("Recherche de l'article avec ID:", id);
+            const brand = shoes.find((item) =>
+              item.stock.find((elem) => elem.id === id),
+            );
+            return brand?.stock.find((el) => el.id === id);
+          })
+          .filter(Boolean) as ShoeStock[])
+      : [];
+
+  console.log("Nombre de favoris trouvés:", favoriteShoes?.length || 0);
 
   const navigateToDetails = (id: string) =>
     navigation.navigate("Details", { id });
@@ -46,7 +79,7 @@ export default function Favorites({ navigation }: ListProps) {
         listScreen
         onPress={() => navigateToDetails(item.id)}
         isFavorite
-      ></VerticalCard>
+      />
     </View>
   );
 
@@ -58,7 +91,15 @@ export default function Favorites({ navigation }: ListProps) {
     );
   }
 
-  if (!user?.favoritesIds?.length) {
+  if (!userId) {
+    return (
+      <View style={styles.emptyListContainer}>
+        <TextBoldL>Connectez-vous pour voir vos favoris</TextBoldL>
+      </View>
+    );
+  }
+
+  if (!user?.favoriteIds?.length) {
     return (
       <View style={styles.emptyListContainer}>
         <TextBoldL>Vous n'avez pas encore de favoris</TextBoldL>
@@ -69,7 +110,7 @@ export default function Favorites({ navigation }: ListProps) {
   return (
     <View style={styles.container}>
       <FlatList
-        data={data as ShoeStock[]}
+        data={favoriteShoes}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         numColumns={2}

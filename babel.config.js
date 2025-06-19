@@ -17,7 +17,8 @@ module.exports = function (api) {
             "@models/*": "./types",
             "@ui-components/*": "./ui-components",
             "@utils/*": "./utils",
-            "@lib/*": "./lib"
+            "@lib/*": "./lib",
+            "@store/*": "./store",
           },
         },
       ],

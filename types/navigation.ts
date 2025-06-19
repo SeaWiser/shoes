@@ -25,4 +25,5 @@ export type MainStackParamList = {
     brand: string;
   };
   NewsList: undefined;
+  Debug: undefined;
 };

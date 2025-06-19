@@ -6,7 +6,7 @@ import { colors } from "@constants/colors";
 import { radius } from "@constants/radius";
 import { spaces } from "@constants/spaces";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+import { RootState } from "@store/store";
 
 interface HttpErrorModalProps {
   isModalVisible: boolean;

@@ -1,4 +1,4 @@
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text, Alert } from "react-native";
 import * as Yup from "yup";
 import { spaces } from "@constants/spaces";
 import { colors } from "@constants/colors";
@@ -64,8 +64,44 @@ export default function AuthForm({
     ...confirmPasswordRule,
   } as Record<string, Yup.StringSchema>);
 
+  const testAppwriteDirectly = async () => {
+    console.log("🔍 Test Appwrite direct...");
+    try {
+      const { testConnection } = require("../../../appwrite");
+      const result = await testConnection();
+
+      if (result) {
+        console.log("✅ Appwrite fonctionne !");
+        Alert.alert("✅ Succès", "Appwrite fonctionne parfaitement !");
+      } else {
+        console.log("❌ Problème avec Appwrite");
+        Alert.alert("❌ Erreur", "Problème de connexion avec Appwrite");
+      }
+    } catch (error: any) {
+      console.error("❌ Erreur test Appwrite:", error);
+      Alert.alert(
+        "❌ Erreur",
+        `Erreur: ${error?.message || "Erreur inconnue"}`,
+      );
+    }
+  };
+
   return (
     <View style={styles.formContainer}>
+      {/* ✅ Bouton Debug Appwrite - seulement en mode DEV et sur l'écran de login */}
+      {__DEV__ && loginScreen && (
+        <View style={styles.debugContainer}>
+          <TouchableOpacity
+            style={styles.debugButton}
+            onPress={testAppwriteDirectly}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.debugText}>🔧 Test Appwrite</Text>
+          </TouchableOpacity>
+          <Text style={styles.devModeText}>Mode développement</Text>
+        </View>
+      )}
+
       <Formik
         initialValues={initialValues}
         onSubmit={submitFormHandler}
@@ -122,6 +158,7 @@ export default function AuthForm({
           </>
         )}
       </Formik>
+
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={navigate}
@@ -136,6 +173,17 @@ export default function AuthForm({
           {loginScreen ? "Inscrivez vous" : "Connectez-vous"}
         </TextBoldM>
       </TouchableOpacity>
+
+      {/* ✅ Alternative : Bouton discret en bas - seulement sur login */}
+      {__DEV__ && loginScreen && (
+        <TouchableOpacity
+          style={styles.debugButtonBottom}
+          onPress={testAppwriteDirectly}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.debugTextBottom}>🏓 Ping Appwrite</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -151,5 +199,50 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     marginTop: spaces.XL,
+  },
+  // ✅ Styles pour les boutons debug
+  debugContainer: {
+    position: "absolute",
+    top: 60,
+    left: spaces.L,
+    right: spaces.L,
+    backgroundColor: "rgba(255, 107, 107, 0.9)",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    zIndex: 1000,
+    elevation: 5,
+  },
+  debugButton: {
+    backgroundColor: colors.DARK,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginBottom: 5,
+  },
+  debugText: {
+    color: colors.LIGHT,
+    fontWeight: "bold",
+    fontSize: 14,
+  },
+  devModeText: {
+    color: colors.LIGHT,
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  debugButtonBottom: {
+    position: "absolute",
+    bottom: 30,
+    left: spaces.L,
+    right: spaces.L,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  debugTextBottom: {
+    color: "white",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });

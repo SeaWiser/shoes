@@ -1,7 +1,7 @@
 import { StyleSheet, ScrollView, KeyboardAvoidingView } from "react-native";
 import * as Yup from "yup";
 import { Formik } from "formik";
-import { User, UserFormValues } from "@models/user";
+import { UserFormValues, ProfileFormUser } from "@models/user";
 import { spaces } from "@constants/spaces";
 import { colors } from "@constants/colors";
 import Input from "@ui-components/inputs/Input";
@@ -10,7 +10,7 @@ import ProfilePicture from "@screens/profile/components/ProfilePicture";
 import { ProfileImage } from "@models/profile";
 
 type ProfileFormProps = {
-  user: User;
+  user: ProfileFormUser;
   submitFormHandler: (values: UserFormValues) => void;
   isLoading: boolean;
   image: ProfileImage;

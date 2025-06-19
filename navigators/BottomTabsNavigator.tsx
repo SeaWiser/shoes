@@ -34,9 +34,8 @@ import DrawerIcon from "@assets/images/navigation/drawer.svg";
 import { spaces } from "@constants/spaces";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { ParamListBase, useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
-import { useGetUserByIdQuery } from "../store/api/userApi";
+import { useGetUserByIdQuery } from "@store/api/userApi";
+import { useAuth } from "@store/api/authApi";
 import { RootStackParamList } from "@models/navigation";
 import AnimatedScreenWrapper from "@navigators/components/AnimatedScreenWrapper";
 import HomeScreen from "@screens/home";
@@ -48,11 +47,12 @@ const originalHeight = IS_LARGE_SCREEN ? 212 : 106;
 const aspectRatio = originalWidth / originalHeight;
 
 export default function BottomTabsNavigator() {
-  const { userId, token } = useSelector((state: RootState) => state.auth);
-  const { data: user } = useGetUserByIdQuery(
-    { userId: userId!, token: token! },
-    { skip: !userId || !token },
-  );
+  const { user: authUser } = useAuth();
+
+  const { data: user } = useGetUserByIdQuery(authUser?.$id!, {
+    skip: !authUser?.$id,
+  });
+
   const badgeCount = user?.cart?.shoes?.length;
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<DrawerNavigationProp<RootStackParamList>>();

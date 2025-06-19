@@ -7,8 +7,8 @@ import { spaces } from "@constants/spaces";
 import { radius } from "@constants/radius";
 import * as ImagePicker from "expo-image-picker";
 import { ProfileImage } from "@models/profile";
-import { Skeleton } from "moti/skeleton";
-import { useState } from "react";
+import { MotiView } from "moti";
+import { useState, useEffect } from "react";
 
 const SIZE = 90;
 
@@ -24,6 +24,17 @@ export default function ProfilePicture({
   photoUrl,
 }: ProfilePictureProps) {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+  // The current URI of the image to be displayed
+  const currentImageUri = image.uri || photoUrl;
+
+  // Reset isImageLoaded when the image changes
+  useEffect(() => {
+    console.log(currentImageUri);
+    console.log(isImageLoaded);
+    setIsImageLoaded(false);
+  }, [currentImageUri]);
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
@@ -38,19 +49,37 @@ export default function ProfilePicture({
   return (
     <View style={styles.container}>
       <Pressable style={styles.imageContainer} onPress={pickImage}>
-        {photoUrl ? (
-          <Skeleton
-            show={!isImageLoaded}
-            width={SIZE}
-            radius={radius.FULL}
-            colorMode="light"
-          >
+        {currentImageUri ? (
+          <View style={styles.imageContainer}>
+            {!isImageLoaded && (
+              <MotiView
+                from={{ opacity: 0.3 }}
+                animate={{ opacity: 0.7 }}
+                transition={{
+                  type: "timing",
+                  duration: 1000,
+                  loop: true,
+                }}
+                style={[
+                  styles.image,
+                  {
+                    position: "absolute",
+                    backgroundColor: colors.GREY,
+                    zIndex: 1,
+                  },
+                ]}
+              />
+            )}
             <Image
-              source={{ uri: image.uri }}
+              source={{ uri: currentImageUri }}
               style={styles.image}
               onLoadEnd={() => setIsImageLoaded(true)}
+              onError={(error) => {
+                console.error("Error loading image:", error);
+                setIsImageLoaded(true); // Stop the loader even in case of error
+              }}
             />
-          </Skeleton>
+          </View>
         ) : (
           <FontAwesome name="user-circle" size={SIZE} color={colors.BLUE} />
         )}

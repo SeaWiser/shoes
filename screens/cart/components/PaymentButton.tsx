@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import CustomButton from "@ui-components/buttons/CustomButton";
 import { useEffect, useState } from "react";
-import { useInitPaymentMutation } from "../../../store/api/stripe";
+import { useInitPaymentMutation } from "@store/api/stripe";
 import {
   initPaymentSheet,
   presentPaymentSheet,

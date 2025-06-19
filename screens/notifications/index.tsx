@@ -7,12 +7,9 @@ import ListItem from "@screens/notifications/components/ListItem";
 import { ShoeStock } from "@models/shoe";
 import { MainStackParamList } from "@models/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import {
-  useGetUserByIdQuery,
-  useUpdateUserMutation,
-} from "../../store/api/userApi";
+import { useAuth } from "@store/api/authApi";
+import { useProfileCreation } from "@hooks/useProfileCreation";
+import { useUpdateUserProfileMutation } from "@store/api/userApi";
 
 const ids = ["nik64p", "adi7p", "adi203p"];
 
@@ -21,12 +18,10 @@ type NotificationsProps = {
 };
 
 export default function Notifications({ navigation }: NotificationsProps) {
-  const { userId, token } = useSelector((state: RootState) => state.auth);
-  const { data: user, isLoading } = useGetUserByIdQuery(
-    { userId: userId!, token: token! },
-    { skip: !userId || !token },
-  );
-  const [updateUser] = useUpdateUserMutation();
+  const { user: authUser } = useAuth();
+  const { userProfile, appwriteUserProfile, isLoadingProfile } =
+    useProfileCreation();
+  const [updateUserProfile] = useUpdateUserProfileMutation();
 
   const data = ids
     .map((id) =>
@@ -40,31 +35,40 @@ export default function Notifications({ navigation }: NotificationsProps) {
     navigation.navigate("Details", { id });
 
   const updateNotif = (id: string) => {
-    if (user?.seenNotifsIds) {
-      updateUser({
-        userId,
-        token,
-        seenNotifsIds: [...user.seenNotifsIds, id],
-      });
-    } else {
-      updateUser({
-        userId,
-        token,
-        seenNotifsIds: [id],
-      });
-    }
+    if (!appwriteUserProfile || !authUser) return;
+
+    const currentSeenNotifs = appwriteUserProfile.seenNotifsIds || [];
+
+    // Check that the notification is not already marked as seen.
+    if (currentSeenNotifs.includes(id)) return;
+
+    const newSeenNotifs = [...currentSeenNotifs, id];
+
+    updateUserProfile({
+      documentId: appwriteUserProfile.$id,
+      userId: authUser.$id,
+      seenNotifsIds: newSeenNotifs,
+    });
   };
 
   const renderItem = ({ item }: { item: ShoeStock }) => (
     <ListItem
       item={item}
       navigateToDetails={navigateToDetails}
-      isSeen={user?.seenNotifsIds?.includes(item.id)}
+      isSeen={appwriteUserProfile?.seenNotifsIds?.includes(item.id)}
       updateNotif={updateNotif}
     />
   );
 
-  if (isLoading) {
+  if (isLoadingProfile || !authUser) {
+    return (
+      <View style={styles.emptyListContainer}>
+        <ActivityIndicator size="large" color={colors.DARK} />
+      </View>
+    );
+  }
+
+  if (!userProfile || !appwriteUserProfile) {
     return (
       <View style={styles.emptyListContainer}>
         <ActivityIndicator size="large" color={colors.DARK} />

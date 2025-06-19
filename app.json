@@ -20,8 +20,7 @@
           "NSAllowsArbitraryLoads": true
         }
       },
-      "bundleIdentifier": "com.yanis52535.projectshoes",
-      "googleServicesFile": "./ios/GoogleService-Info.plist"
+      "bundleIdentifier": "com.yanis52535.projectshoes"
     },
     "android": {
       "adaptiveIcon": {
@@ -30,7 +29,6 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.yanis52535.projectshoes",
-      "googleServicesFile": "./android/app/google-services.json",
       "permissions": [
         "android.permission.RECORD_AUDIO"
       ]
@@ -52,7 +50,17 @@
           "crashlytics_auto_collection_enabled": true
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      "react-native-iap",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "modularHeaders": true
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {

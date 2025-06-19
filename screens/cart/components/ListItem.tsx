@@ -1,3 +1,4 @@
+import React from "react";
 import { View, StyleSheet, Image, Pressable, Platform } from "react-native";
 import TextBoldL from "@ui-components/texts/TextBoldL";
 import TextBoldXL from "@ui-components/texts/TextBoldXL";
@@ -10,11 +11,8 @@ import { radius } from "@constants/radius";
 import { CartItem } from "@models/cart";
 import { Skeleton } from "moti/skeleton";
 
-export const SkeletonProps: {
-  colorMode: "light" | "dark" | undefined;
-  radius: number;
-} = {
-  colorMode: "light",
+export const SkeletonProps = {
+  colorMode: "light" as const,
   radius: radius.REGULAR,
 };
 
@@ -31,17 +29,17 @@ export default function ListItem({
   updateQuantity,
   isLoading,
 }: ListItemProps) {
-  const decreaseShoesQuantity = () => {
-    if (item.quantity > 1) {
-      updateQuantity(item.id, false);
-    }
+  const removeShoes = () => {
+    removeShoesFromCart(item.id);
   };
 
   const increaseShoesQuantity = () => {
     updateQuantity(item.id, true);
   };
 
-  const removeShoes = () => removeShoesFromCart(item.id);
+  const decreaseShoesQuantity = () => {
+    updateQuantity(item.id, false);
+  };
 
   return (
     <View style={styles.container}>
@@ -64,7 +62,7 @@ export default function ListItem({
                 <Pressable
                   style={[
                     styles.operationSignContainer,
-                    styles.subtractSignContainer,
+                    styles.substractSignContainer,
                   ]}
                   onPress={decreaseShoesQuantity}
                 >
@@ -149,7 +147,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  subtractSignContainer: {
+  substractSignContainer: {
     backgroundColor: colors.WHITE,
   },
   minusText: {

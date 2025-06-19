@@ -11,6 +11,5 @@ export interface CartItem {
 
 export interface Cart {
   shoes: CartItem[];
-
   totalAmount: number;
 }

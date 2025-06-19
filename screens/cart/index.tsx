@@ -1,7 +1,5 @@
-import { View, StyleSheet, FlatList, ImageSourcePropType } from "react-native"; // Added ImageSourcePropType
+import { View, StyleSheet, FlatList, ImageSourcePropType } from "react-native";
 import { colors } from "@constants/colors";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
 import ItemSeparator from "@ui-components/separators/ListItemSeparator";
 import { spaces } from "@constants/spaces";
 import ListItem, { SkeletonProps } from "@screens/cart/components/ListItem";
@@ -10,40 +8,30 @@ import TextBoldXL from "@ui-components/texts/TextBoldXL";
 import { radius } from "@constants/radius";
 import DashedLine from "@ui-components/separators/DashedLine";
 import { IS_LARGE_SCREEN } from "@constants/sizes";
-import {
-  useGetUserByIdQuery,
-  useUpdateUserMutation,
-} from "../../store/api/userApi";
-import { useFetchPublishableKeyQuery } from "../../store/api/stripe";
+import { useUpdateUserProfileMutation } from "@store/api/userApi";
+import { useAuth } from "@store/api/authApi";
+import { useProfileCreation } from "@hooks/useProfileCreation";
+import { useFetchPublishableKeyQuery } from "@store/api/stripe";
 import { useEffect, useMemo, useState } from "react";
 import { initStripe } from "@stripe/stripe-react-native";
 import PaymentButton from "@screens/cart/components/PaymentButton";
 import PaymentSuccess from "@screens/cart/components/PaymentSuccess";
+import { CartItem, Cart as CartType } from "@models/cart";
 import { Skeleton } from "moti/skeleton";
-import { CartItem } from "@models/cart"; // Added import
 
 export default function Cart() {
   const placeholderList: CartItem[] = useMemo(() => {
-    return Array.from({ length: 3 }).map((_, i): CartItem => {
-      return {
-        id: i.toString(),
-        name: "Placeholder Shoe",
-        image: {
-          uri: "https://via.placeholder.com/150",
-        } as ImageSourcePropType, // Cast to ImageSourcePropType
-        size: 0,
-        price: 0,
-        quantity: 0,
-      };
+    return Array.from({ length: 3 }).map((_, i): any => {
+      return { id: i.toString() };
     });
   }, []);
+
   const [isPaymentDone, setIsPaymentDone] = useState(false);
-  const { userId, token } = useSelector((state: RootState) => state.auth);
-  const { data: user, isLoading } = useGetUserByIdQuery(
-    { userId: userId!, token: token! },
-    { skip: !userId || !token },
-  );
-  const [updateUser] = useUpdateUserMutation();
+
+  const { user: authUser } = useAuth();
+  const { appwriteUserProfile, isLoadingProfile } = useProfileCreation();
+
+  const [updateUserProfile] = useUpdateUserProfileMutation();
   const [isStripeInitialized, setIsStripeInitialized] = useState(false);
 
   const { data } = useFetchPublishableKeyQuery();
@@ -58,42 +46,50 @@ export default function Cart() {
 
   const resetCart = () => {
     setIsPaymentDone(false);
-    updateUser({
-      userId,
-      token,
-      cart: {
-        shoes: [],
-        totalAmount: 0,
-      },
-    });
+    if (appwriteUserProfile && authUser) {
+      updateUserProfile({
+        documentId: appwriteUserProfile.$id,
+        userId: authUser.$id,
+        cart: {
+          shoes: [],
+          totalAmount: 0,
+        },
+      });
+    }
   };
 
-  const totalAmount = user?.cart?.totalAmount ?? 0;
+  const totalAmount = appwriteUserProfile?.cart?.totalAmount ?? 0;
 
   const removeShoesFromCart = (id: string) => {
-    if (!user?.cart?.shoes || !user.cart.totalAmount) return;
+    if (!appwriteUserProfile?.cart?.shoes || !authUser) return;
 
-    const shoesToRemove = user.cart.shoes.find((el) => el.id === id);
-    if (!shoesToRemove?.price || !shoesToRemove.quantity) return;
+    const shoesToRemove = appwriteUserProfile.cart.shoes.find(
+      (el) => el.id === id,
+    );
+    if (!shoesToRemove) return;
 
     const newCart = {
-      shoes: user.cart.shoes.filter((el) => el.id !== id),
+      shoes: appwriteUserProfile.cart.shoes.filter((el) => el.id !== id),
       totalAmount:
-        user.cart.totalAmount - shoesToRemove.price * shoesToRemove.quantity,
+        appwriteUserProfile.cart.totalAmount -
+        shoesToRemove.price * shoesToRemove.quantity,
     };
 
-    updateUser({
-      userId,
-      token,
+    updateUserProfile({
+      documentId: appwriteUserProfile.$id,
+      userId: authUser.$id,
       cart: newCart,
     });
   };
 
   const updateQuantity = (id: string, increase: boolean) => {
-    const newCart = JSON.parse(JSON.stringify(user?.cart));
-    const index = newCart.shoes.indexOf(
-      newCart.shoes.find((el: any) => el.id === id),
-    );
+    if (!appwriteUserProfile?.cart || !authUser) return;
+
+    const newCart = JSON.parse(JSON.stringify(appwriteUserProfile.cart));
+    const index = newCart.shoes.findIndex((el: any) => el.id === id);
+
+    if (index === -1) return;
+
     if (increase) {
       newCart.shoes[index].quantity += 1;
       newCart.totalAmount += newCart.shoes[index].price;
@@ -101,24 +97,28 @@ export default function Cart() {
       newCart.shoes[index].quantity -= 1;
       newCart.totalAmount -= newCart.shoes[index].price;
     }
-    updateUser({
-      userId,
-      token,
+
+    updateUserProfile({
+      documentId: appwriteUserProfile.$id,
+      userId: authUser.$id,
       cart: newCart,
     });
   };
 
-  if ((!user?.cart?.shoes?.length || !totalAmount) && isLoading) {
+  if (!appwriteUserProfile?.cart?.shoes?.length && !isLoadingProfile) {
     return (
       <View style={styles.listEmptyContainer}>
         <TextBoldL>Votre panier est vide</TextBoldL>
       </View>
     );
   }
+
   return (
     <View style={styles.container}>
       <FlatList<CartItem>
-        data={!isLoading ? user?.cart?.shoes : placeholderList}
+        data={
+          !isLoadingProfile ? appwriteUserProfile?.cart?.shoes : placeholderList
+        }
         showsVerticalScrollIndicator={false}
         keyExtractor={({ id }) => id}
         renderItem={({ item }) => (
@@ -126,7 +126,7 @@ export default function Cart() {
             item={item}
             removeShoesFromCart={removeShoesFromCart}
             updateQuantity={updateQuantity}
-            isLoading={isLoading}
+            isLoading={isLoadingProfile}
           />
         )}
         style={styles.listContainer}
@@ -134,7 +134,7 @@ export default function Cart() {
         numColumns={IS_LARGE_SCREEN ? 2 : 1}
       />
       <View style={styles.priceContainer}>
-        <Skeleton.Group show={isLoading}>
+        <Skeleton.Group show={isLoadingProfile}>
           <View style={styles.rowContainer}>
             <TextBoldXL>Sous total</TextBoldXL>
             <Skeleton {...SkeletonProps}>
@@ -142,21 +142,16 @@ export default function Cart() {
             </Skeleton>
           </View>
           <View style={styles.rowContainer}>
-            <TextBoldXL>Frais de port</TextBoldXL>
+            <TextBoldL>Livraison</TextBoldL>
             <Skeleton {...SkeletonProps}>
-              <TextBoldXL>{Math.floor(totalAmount / 15)} €</TextBoldXL>
+              <TextBoldL>0 €</TextBoldL>
             </Skeleton>
           </View>
-
-          <DashedLine
-            style={{ marginBottom: spaces.M, borderColor: colors.GREY }}
-          />
+          <DashedLine style={styles.dashedLine} />
           <View style={styles.rowContainer}>
             <TextBoldXL>Total</TextBoldXL>
             <Skeleton {...SkeletonProps}>
-              <TextBoldXL>
-                {totalAmount + Math.floor(totalAmount / 15)} €
-              </TextBoldXL>
+              <TextBoldXL>{totalAmount} €</TextBoldXL>
             </Skeleton>
           </View>
           <PaymentButton
@@ -165,7 +160,7 @@ export default function Cart() {
           />
         </Skeleton.Group>
       </View>
-      {isPaymentDone ? <PaymentSuccess onPress={resetCart} /> : null}
+      {isPaymentDone && <PaymentSuccess onPress={resetCart} />}
     </View>
   );
 }
@@ -197,7 +192,7 @@ const styles = StyleSheet.create({
     marginBottom: spaces.M,
   },
   dashedLine: {
-    borderBottomWidth: 1,
+    borderWidth: 1,
     borderColor: colors.GREY,
     borderStyle: "dashed",
     marginBottom: spaces.M,

@@ -89,6 +89,7 @@ android {
 
     namespace 'com.yanis52535.projectshoes'
     defaultConfig {
+missingDimensionStrategy "store", "play"
         applicationId 'com.yanis52535.projectshoes'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -176,5 +177,5 @@ dependencies {
     }
 }
 
-apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'

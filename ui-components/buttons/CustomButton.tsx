@@ -7,18 +7,21 @@ type CustomButtonProps = {
   text: string;
   onPress: () => void;
   isLoading?: boolean;
+  disabled?: boolean;
 };
 
 export default function CustomButton({
   text,
   onPress,
   isLoading,
+  disabled,
 }: CustomButtonProps) {
   return (
     <TouchableOpacity
       activeOpacity={0.8}
-      style={styles.btnContainer}
+      style={[styles.btnContainer, disabled && styles.btnDisabled]}
       onPress={onPress}
+      disabled={disabled || isLoading}
     >
       {isLoading ? (
         <ActivityIndicator color={colors.LIGHT} size="small" />
@@ -40,5 +43,9 @@ const styles = StyleSheet.create({
   },
   btnText: {
     color: colors.WHITE,
+  },
+  btnDisabled: {
+    backgroundColor: colors.BLUE,
+    opacity: 0.4,
   },
 });
