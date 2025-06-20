@@ -13,10 +13,7 @@ type BaseFormValues = {
   password: string;
 };
 
-type AuthFormValues = BaseFormValues &
-  Partial<{
-    confirmPassword: string;
-  }>;
+type AuthFormValues = BaseFormValues & Partial<{ confirmPassword: string }>;
 
 type AuthFormProps = {
   loginScreen?: boolean;
@@ -64,44 +61,8 @@ export default function AuthForm({
     ...confirmPasswordRule,
   } as Record<string, Yup.StringSchema>);
 
-  const testAppwriteDirectly = async () => {
-    console.log("🔍 Test Appwrite direct...");
-    try {
-      const { testConnection } = require("../../../appwrite");
-      const result = await testConnection();
-
-      if (result) {
-        console.log("✅ Appwrite fonctionne !");
-        Alert.alert("✅ Succès", "Appwrite fonctionne parfaitement !");
-      } else {
-        console.log("❌ Problème avec Appwrite");
-        Alert.alert("❌ Erreur", "Problème de connexion avec Appwrite");
-      }
-    } catch (error: any) {
-      console.error("❌ Erreur test Appwrite:", error);
-      Alert.alert(
-        "❌ Erreur",
-        `Erreur: ${error?.message || "Erreur inconnue"}`,
-      );
-    }
-  };
-
   return (
     <View style={styles.formContainer}>
-      {/* ✅ Bouton Debug Appwrite - seulement en mode DEV et sur l'écran de login */}
-      {__DEV__ && loginScreen && (
-        <View style={styles.debugContainer}>
-          <TouchableOpacity
-            style={styles.debugButton}
-            onPress={testAppwriteDirectly}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.debugText}>🔧 Test Appwrite</Text>
-          </TouchableOpacity>
-          <Text style={styles.devModeText}>Mode développement</Text>
-        </View>
-      )}
-
       <Formik
         initialValues={initialValues}
         onSubmit={submitFormHandler}
@@ -173,17 +134,6 @@ export default function AuthForm({
           {loginScreen ? "Inscrivez vous" : "Connectez-vous"}
         </TextBoldM>
       </TouchableOpacity>
-
-      {/* ✅ Alternative : Bouton discret en bas - seulement sur login */}
-      {__DEV__ && loginScreen && (
-        <TouchableOpacity
-          style={styles.debugButtonBottom}
-          onPress={testAppwriteDirectly}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.debugTextBottom}>🏓 Ping Appwrite</Text>
-        </TouchableOpacity>
-      )}
     </View>
   );
 }

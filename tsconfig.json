@@ -15,7 +15,8 @@
       "@ui-components/*": ["ui-components/*"],
       "@utils/*": ["utils/*"],
       "@lib/*": ["lib/*"],
-      "@store/*": ["store/*"]
+      "@store/*": ["store/*"],
+      "@services/*": ["services/*"]
     }
   }
 }

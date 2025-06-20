@@ -1,5 +1,6 @@
 import { Models } from "react-native-appwrite";
 import { Cart } from "@models/cart";
+import { ProfileFormUser } from "./profile";
 
 export interface UserLocation {
   postalCode?: string;
@@ -13,7 +14,7 @@ export interface AppwriteUser extends Models.Document {
   fullName: string;
   photoUrl?: string;
   location?: UserLocation;
-  favoriteIds?: string[];
+  favoriteIds?: string[]; // ✅ Garder favoriteIds
   cart?: Cart;
   seenNotifsIds?: string[];
 }
@@ -32,21 +33,9 @@ export interface LegacyUser {
 
 // Unified interface for forms
 export interface UserFormValues {
-  fullName: string;
-  location: UserLocation;
-}
-
-// Interface for ProfileForm - compatible with the old system
-export interface ProfileFormUser {
-  $id?: string; // Pour Appwrite
-  id?: string; // Pour Firebase (legacy)
   email: string;
-  fullName: string;
-  photoUrl?: string;
+  fullName?: string;
   location?: UserLocation;
-  favoritesIds?: string[];
-  seenNotifsIds?: string[];
-  cart?: any[];
 }
 
 // Utility function to convert AppwriteUser to ProfileFormUser
@@ -55,15 +44,14 @@ export const adaptAppwriteUserForForm = (
 ): ProfileFormUser => {
   return {
     $id: appwriteUser.$id,
-    id: appwriteUser.$id, // Use the document ID as the legacy ID
+    userId: appwriteUser.userId,
     email: appwriteUser.email,
     fullName: appwriteUser.fullName,
     photoUrl: appwriteUser.photoUrl,
     location: appwriteUser.location,
-    // Default properties for compatibility
-    favoritesIds: appwriteUser.favoriteIds || [],
+    favoriteIds: appwriteUser.favoriteIds || [],
     seenNotifsIds: appwriteUser.seenNotifsIds || [],
-    cart: [],
+    cart: appwriteUser.cart || { shoes: [], totalAmount: 0 },
   };
 };
 

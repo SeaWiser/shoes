@@ -1,33 +1,9 @@
 import { useEffect } from "react";
-import { useAuth } from "@store/api/authApi";
-import {
-  useGetUserByIdQuery,
-  useCreateUserProfileMutation,
-  CreateUserRequest,
-} from "@store/api/userApi";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import {
-  AppwriteUser,
-  adaptAppwriteUserForForm,
-  ProfileFormUser,
-} from "@models/user";
-
-/**
- * Type guard to check if the error is a FetchBaseQueryError
- */
-const isFetchBaseQueryError = (error: any): error is FetchBaseQueryError => {
-  return error && typeof error === "object" && "status" in error;
-};
-
-/**
- * Utility function to extract the status from an RTK Query error
- */
-const getErrorStatus = (error: any): number | undefined => {
-  if (isFetchBaseQueryError(error)) {
-    return typeof error.status === "number" ? error.status : undefined;
-  }
-  return undefined;
-};
+import { useAuth } from "./queries/useAuth";
+import { useUserById, useCreateUserProfile } from "./queries/useUser";
+import { CreateUserRequest } from "@services/userService";
+import { adaptAppwriteUserForForm } from "@models/user";
+import { ProfileFormUser } from "@models/profile";
 
 /**
  * Hook to manage automatic user profile creation
@@ -40,12 +16,11 @@ export const useProfileCreation = () => {
     data: appwriteUserProfile,
     isLoading: isCheckingProfile,
     error: profileError,
-  } = useGetUserByIdQuery(authUser?.$id || "", {
-    skip: !authUser?.$id || !isAuthenticated,
+  } = useUserById(authUser?.$id || "", {
+    enabled: !!authUser?.$id && isAuthenticated,
   });
 
-  const [createUserProfile, { isLoading: isCreatingProfile }] =
-    useCreateUserProfileMutation();
+  const createUserProfileMutation = useCreateUserProfile();
 
   /**
    * Function exported to create a profile explicitly
@@ -80,7 +55,8 @@ export const useProfileCreation = () => {
         city: "",
       };
 
-      const result = await createUserProfile(userProfileData).unwrap();
+      const result =
+        await createUserProfileMutation.mutateAsync(userProfileData);
       console.log("✅ Profil créé explicitement");
       return result;
     } catch (error) {
@@ -92,13 +68,18 @@ export const useProfileCreation = () => {
   // Create the profile automatically if it doesn't exist
   useEffect(() => {
     const createProfileIfNeeded = async () => {
+      // ✅ Vérifier si l'erreur indique que le profil n'existe pas
+      const isProfileNotFound = profileError?.message?.includes(
+        "User profile not found",
+      );
+
       const shouldCreateProfile =
         isAuthenticated &&
         authUser &&
         !isCheckingProfile &&
         !appwriteUserProfile &&
-        profileError &&
-        getErrorStatus(profileError) === 404;
+        isProfileNotFound &&
+        !createUserProfileMutation.isPending;
 
       if (shouldCreateProfile) {
         try {
@@ -125,11 +106,11 @@ export const useProfileCreation = () => {
             city: "",
           };
 
-          await createUserProfile(userProfileData).unwrap();
+          await createUserProfileMutation.mutateAsync(userProfileData);
 
-          console.log("✅ Automatically created profile");
+          console.log("✅ Profil créé automatiquement");
         } catch (error) {
-          console.error("❌ Error while creating profile:", error);
+          console.error("❌ Erreur lors de la création du profil:", error);
         }
       }
     };
@@ -141,11 +122,12 @@ export const useProfileCreation = () => {
     isCheckingProfile,
     appwriteUserProfile,
     profileError,
-    createUserProfile,
+    createUserProfileMutation,
   ]);
 
-  // Determine if we have a real error (not a 404 indicating the profile simply doesn't exist)
-  const hasRealError = profileError && getErrorStatus(profileError) !== 404;
+  // Determine if we have a real error (not a "profile not found" error)
+  const hasRealError =
+    profileError && !profileError.message?.includes("User profile not found");
 
   const userProfile: ProfileFormUser | null = appwriteUserProfile
     ? adaptAppwriteUserForForm(appwriteUserProfile)
@@ -154,7 +136,7 @@ export const useProfileCreation = () => {
   return {
     userProfile, // Profile adapted for ProfileForm
     appwriteUserProfile, // Profile Appwrite original
-    isLoadingProfile: isCheckingProfile || isCreatingProfile,
+    isLoadingProfile: isCheckingProfile || createUserProfileMutation.isPending,
     profileError: hasRealError ? profileError : null,
     createUserProfileExplicitly, // Function to create a profile explicitly
   };

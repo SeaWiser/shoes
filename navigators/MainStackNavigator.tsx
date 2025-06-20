@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Pressable } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import { colors } from "@constants/colors";
 import Details from "@screens/details";
 import { MainStackParamList } from "@models/navigation";
@@ -8,60 +8,48 @@ import DrawerNavigator from "@navigators/DrawerNavigator";
 import Cart from "@screens/cart";
 import Signup from "@screens/auth/Signup";
 import Login from "@screens/auth/Login";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@store/store";
-import { setHttpError } from "@store/slices/errorSlice";
+import { useCurrentUser } from "@hooks/queries/useAuth";
+import { useErrorStore } from "@store/errorStore";
 import HttpErrorModal from "@ui-components/modals/httpErrorModal";
-import { useGetCurrentUserQuery } from "@store/api/authApi";
-import { useEffect, useState } from "react";
 import SplashScreen from "@screens/splashScreen";
-import List from "@screens/list";
-import NewsList from "@screens/newsList";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAppInitialization } from "@hooks/useAppInitialization";
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
 
 export default function MainStackNavigator() {
-  const insets = useSafeAreaInsets();
-  const dispatch = useDispatch();
+  const { data: currentUser, isLoading: isCheckingAuth } = useCurrentUser();
+  const { httpError, setHttpError } = useErrorStore();
 
-  const {
-    data: currentUser,
-    isLoading: isCheckingAuth,
-    error: authError,
-  } = useGetCurrentUserQuery();
-
-  const httpError = useSelector((state: RootState) => state.error.httpError);
-  const [splashVisible, setSplashVisible] = useState(true);
+  // ✅ Hook d'initialisation avec données réelles
+  const { isLoading, progress, currentStep, isReady } = useAppInitialization();
 
   const closeHttpErrorModal = () => {
-    dispatch(setHttpError(false));
+    setHttpError(false);
   };
 
-  useEffect(() => {
-    if (currentUser) {
-      console.log("✅ Utilisateur connecté:", currentUser.email);
-    } else if (!isCheckingAuth) {
-      console.log("ℹ️ Aucun utilisateur connecté");
-    }
-  }, [currentUser, isCheckingAuth]);
-
-  // Gestion du SplashScreen
-  const handleSplashScreenAnimationFinish = () => {
-    console.log("SplashScreen animation terminée");
-    if (!isCheckingAuth) {
-      setSplashVisible(false);
-    }
+  const appReadyHandler = () => {
+    console.log("🚀 App prête à être utilisée !");
   };
 
-  useEffect(() => {
-    if (!isCheckingAuth && splashVisible) {
-      setSplashVisible(false);
-    }
-  }, [isCheckingAuth, splashVisible]);
+  // ✅ Afficher le splash screen pendant l'initialisation
+  if (isLoading || !isReady) {
+    return (
+      <SplashScreen
+        appReadyHandler={appReadyHandler}
+        progress={progress}
+        currentStep={currentStep}
+        isDataReady={isReady}
+      />
+    );
+  }
 
-  if (isCheckingAuth || splashVisible) {
-    return <SplashScreen appReadyHandler={handleSplashScreenAnimationFinish} />;
+  // ✅ Loader minimal pour les vérifications finales
+  if (isCheckingAuth) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator color={colors.BLUE} size="large" />
+      </View>
+    );
   }
 
   const isAuthenticated = !!currentUser;
@@ -101,8 +89,10 @@ export default function MainStackNavigator() {
                 headerShown: false,
               }}
             />
-            <Stack.Group
-              screenOptions={({ navigation }) => ({
+            <Stack.Screen
+              name="Details"
+              component={Details}
+              options={({ navigation }) => ({
                 headerLeft: () => (
                   <Pressable onPress={() => navigation.goBack()}>
                     <Ionicons
@@ -113,34 +103,24 @@ export default function MainStackNavigator() {
                   </Pressable>
                 ),
               })}
-            >
-              <Stack.Screen name="Details" component={Details} />
-              <Stack.Screen
-                name="MainCart"
-                component={Cart}
-                options={{
-                  title: "Mon Panier",
-                  animation: "slide_from_bottom",
-                }}
-              />
-              <Stack.Group
-                screenOptions={{
-                  contentStyle: {
-                    backgroundColor: colors.LIGHT,
-                    paddingBottom: insets.bottom,
-                  },
-                }}
-              >
-                <Stack.Screen name="List" component={List} />
-                <Stack.Screen
-                  name="NewsList"
-                  component={NewsList}
-                  options={{
-                    title: "Nouveautés",
-                  }}
-                />
-              </Stack.Group>
-            </Stack.Group>
+            />
+            <Stack.Screen
+              name="MainCart"
+              component={Cart}
+              options={({ navigation }) => ({
+                title: "Panier",
+                animation: "slide_from_bottom",
+                headerLeft: () => (
+                  <Pressable onPress={() => navigation.goBack()}>
+                    <Ionicons
+                      name="chevron-back"
+                      size={24}
+                      color={colors.DARK}
+                    />
+                  </Pressable>
+                ),
+              })}
+            />
           </>
         )}
       </Stack.Navigator>
@@ -151,3 +131,12 @@ export default function MainStackNavigator() {
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.LIGHT,
+  },
+});

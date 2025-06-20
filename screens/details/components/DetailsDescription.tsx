@@ -1,4 +1,4 @@
-import { StyleSheet, View, Alert, Pressable } from "react-native";
+import { StyleSheet, View } from "react-native";
 import TextBoldXL from "@ui-components/texts/TextBoldXL";
 import { spaces } from "@constants/spaces";
 import { colors } from "@constants/colors";
@@ -6,15 +6,11 @@ import TextBoldL from "@ui-components/texts/TextBoldL";
 import TextMediumM from "@ui-components/texts/TextMediumM";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ICON_SIZE } from "@constants/sizes";
-import { useSelector } from "react-redux";
-import { RootState } from "@store/store";
-import {
-  useGetUserByIdQuery,
-  useToggleFavoriteMutation,
-} from "@store/api/userApi";
-import { useAuth } from "@store/api/authApi";
-import { useEffect, useState, useRef } from "react";
-import { MotiView, AnimatePresence } from "moti";
+import { useAuthStore } from "../../../store/authStore";
+import { useUserById, useToggleFavorite } from "@hooks/queries/useUser";
+import { useFavoritesStore } from "../../../store/favoritesStore";
+import { useState, useRef } from "react";
+import * as Haptics from "expo-haptics";
 
 type DetailsDescriptionProps = {
   name: string;
@@ -29,82 +25,85 @@ export default function DetailsDescription({
   description,
   id,
 }: DetailsDescriptionProps) {
-  const { user: authUser, isAuthenticated } = useAuth();
-  const { userId: reduxUserId } = useSelector((state: RootState) => state.auth);
-  const userId = authUser?.$id || reduxUserId;
-
-  const { data: user, refetch } = useGetUserByIdQuery(userId!, {
-    skip: !userId,
+  const { user: authUser } = useAuthStore();
+  const { data: user } = useUserById(authUser?.$id!, {
+    enabled: !!authUser?.$id,
   });
-  const [toggleFavorite, { isLoading }] = useToggleFavoriteMutation();
 
-  // Status for optimistic update
-  const [optimisticFavorite, setOptimisticFavorite] = useState<boolean | null>(
-    null,
-  );
-  const [isAnimating, setIsAnimating] = useState(false);
+  const toggleFavoriteMutation = useToggleFavorite();
+  const { favoritesShoesIds, toggleFavorite: toggleLocalFavorite } =
+    useFavoritesStore();
 
-  // Ref to track whether a mutation is in progress
-  const mutationInProgress = useRef(false);
+  // ✅ État optimiste avec timestamp pour éviter les doubles animations
+  const [optimisticState, setOptimisticState] = useState<{
+    isFavorite: boolean;
+    timestamp: number;
+  } | null>(null);
 
-  const actualIsFavorite = user?.favoriteIds?.includes(id) || false;
-  const isFavorite =
-    optimisticFavorite !== null ? optimisticFavorite : actualIsFavorite;
+  // ✅ Ref pour éviter les mises à jour concurrentes
+  const isUpdatingRef = useRef(false);
 
-  // Synchronize the optimistic state with the actual state after the mutation
-  useEffect(() => {
-    if (!mutationInProgress.current && optimisticFavorite !== null) {
-      setOptimisticFavorite(null);
+  // ✅ Logique simplifiée pour déterminer l'état favori
+  const isFavorite = (() => {
+    // Utiliser l'état optimiste s'il est récent (moins de 2 secondes)
+    if (optimisticState && Date.now() - optimisticState.timestamp < 2000) {
+      return optimisticState.isFavorite;
     }
-  }, [actualIsFavorite]);
 
-  const handleToggleFavorite = async () => {
-    if (!isAuthenticated || !userId) {
-      Alert.alert(
-        "Required Authentication",
-        "You must be logged in to add items to your favorites.",
-        [{ text: "OK" }],
+    // Sinon utiliser les données du serveur en priorité
+    if (user?.favoriteIds) {
+      return user.favoriteIds.includes(id);
+    }
+
+    // Fallback sur Zustand store
+    return favoritesShoesIds.includes(id);
+  })();
+
+  const iconName = isFavorite ? "star" : "staro";
+
+  const toggleFavorite = async () => {
+    if (!user || !authUser?.$id || isUpdatingRef.current) {
+      console.log(
+        "❌ Action bloquée - Utilisateur non connecté ou mise à jour en cours",
       );
       return;
     }
 
-    if (!user || mutationInProgress.current) {
-      return;
-    }
-
-    // Haptic feedback pour une meilleure expérience
     try {
-      const Haptics = await import("expo-haptics");
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {}
+      isUpdatingRef.current = true;
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    // Animation et optimistic update
-    setIsAnimating(true);
-    setOptimisticFavorite(!isFavorite);
-    mutationInProgress.current = true;
+      const newFavoriteState = !isFavorite;
 
-    toggleFavorite({
-      userId,
-      documentId: user.$id,
-      shoeId: id,
-    })
-      .unwrap()
-      .then(() => {
-        refetch();
-      })
-      .catch((error) => {
-        console.error("Error updating favorites:", error);
-        setOptimisticFavorite(actualIsFavorite);
-        Alert.alert(
-          "Error",
-          "Unable to update your favorites. Please try again.",
-          [{ text: "OK" }],
-        );
-      })
-      .finally(() => {
-        mutationInProgress.current = false;
-        setTimeout(() => setIsAnimating(false), 300);
+      // ✅ Mise à jour optimiste avec timestamp
+      setOptimisticState({
+        isFavorite: newFavoriteState,
+        timestamp: Date.now(),
       });
+
+      console.log("🔄 Toggle favorite pour:", id, "→", newFavoriteState);
+
+      // ✅ Mettre à jour TanStack Query avec optimistic updates
+      await toggleFavoriteMutation.mutateAsync({
+        userId: authUser.$id,
+        documentId: user.$id,
+        shoeId: id,
+      });
+
+      console.log("✅ Favoris mis à jour avec succès");
+
+      // ✅ Clear l'état optimiste après succès
+      setTimeout(() => {
+        setOptimisticState(null);
+      }, 100);
+    } catch (error) {
+      console.error("❌ Erreur mise à jour favoris:", error);
+
+      // ✅ Rollback de l'état optimiste
+      setOptimisticState(null);
+    } finally {
+      isUpdatingRef.current = false;
+    }
   };
 
   return (
@@ -115,111 +114,13 @@ export default function DetailsDescription({
         </TextMediumM>
         <View style={styles.nameAndFavoriteContainer}>
           <TextBoldXL style={styles.textSpacing}>{name}</TextBoldXL>
-
-          <Pressable
-            onPress={handleToggleFavorite}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            style={styles.favoriteButton}
-          >
-            <AnimatePresence>
-              {isFavorite ? (
-                <MotiView
-                  key="filled"
-                  from={{
-                    scale: isAnimating ? 0 : 1,
-                    opacity: isAnimating ? 0 : 1,
-                    rotate: isAnimating ? "180deg" : "0deg",
-                  }}
-                  animate={{
-                    scale: 1,
-                    opacity: 1,
-                    rotate: "0deg",
-                  }}
-                  exit={{
-                    scale: 0,
-                    opacity: 0,
-                    rotate: "-180deg",
-                  }}
-                  transition={{
-                    type: "timing",
-                    duration: 300,
-                    scale: {
-                      type: "spring",
-                      damping: 15,
-                      stiffness: 300,
-                    },
-                  }}
-                  style={styles.iconContainer}
-                >
-                  <AntDesign
-                    name="star"
-                    size={ICON_SIZE}
-                    color={colors.BLUE}
-                    suppressHighlighting={true}
-                  />
-                </MotiView>
-              ) : (
-                <MotiView
-                  key="outline"
-                  from={{
-                    scale: isAnimating ? 1.2 : 1,
-                    opacity: isAnimating ? 0 : 1,
-                  }}
-                  animate={{
-                    scale: 1,
-                    opacity: 1,
-                  }}
-                  exit={{
-                    scale: 1.2,
-                    opacity: 0,
-                  }}
-                  transition={{
-                    type: "timing",
-                    duration: 200,
-                  }}
-                  style={styles.iconContainer}
-                >
-                  <AntDesign
-                    name="staro"
-                    size={ICON_SIZE}
-                    color={colors.BLUE}
-                    suppressHighlighting={true}
-                  />
-                </MotiView>
-              )}
-            </AnimatePresence>
-
-            {/* Particle effect for the favorite */}
-            {isAnimating && isFavorite && (
-              <>
-                {[...Array(6)].map((_, index) => (
-                  <MotiView
-                    key={`particle-${index}`}
-                    from={{
-                      opacity: 1,
-                      scale: 0,
-                      translateX: 0,
-                      translateY: 0,
-                    }}
-                    animate={{
-                      opacity: 0,
-                      scale: 1,
-                      translateX: Math.cos((index * 60 * Math.PI) / 180) * 25,
-                      translateY: Math.sin((index * 60 * Math.PI) / 180) * 25,
-                    }}
-                    transition={{
-                      type: "timing",
-                      duration: 600,
-                      delay: index * 50,
-                    }}
-                    style={styles.particle}
-                  >
-                    <View style={styles.particleDot} />
-                  </MotiView>
-                ))}
-              </>
-            )}
-          </Pressable>
+          <AntDesign
+            name={iconName}
+            size={ICON_SIZE}
+            color={colors.BLUE}
+            onPress={toggleFavorite}
+            suppressHighlighting={true}
+          />
         </View>
       </View>
       <TextBoldL style={styles.textSpacing}>{price} €</TextBoldL>
@@ -238,30 +139,8 @@ const styles = StyleSheet.create({
   nameAndFavoriteContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
   },
   descriptionText: {
     color: colors.GREY,
-  },
-  favoriteButton: {
-    position: "relative",
-    width: ICON_SIZE,
-    height: ICON_SIZE,
-  },
-  iconContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-  },
-  particle: {
-    position: "absolute",
-    top: ICON_SIZE / 2 - 2,
-    left: ICON_SIZE / 2 - 2,
-  },
-  particleDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.BLUE,
   },
 });

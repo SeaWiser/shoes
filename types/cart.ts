@@ -1,15 +1,15 @@
-import { ImageSourcePropType } from "react-native";
+import { ShoeSize } from "@models/shoe-size";
 
-export interface CartItem {
+export interface CartShoe {
   id: string;
   name: string;
-  image: ImageSourcePropType;
-  size: number;
+  image: string; // ✅ Garder string pour l'URL/path
+  size: ShoeSize;
   price: number;
   quantity: number;
 }
 
 export interface Cart {
-  shoes: CartItem[];
+  shoes: CartShoe[];
   totalAmount: number;
 }

@@ -15,59 +15,89 @@ import ListItemSeparator from "@ui-components/separators/ListItemSeparator";
 import { IS_LARGE_SCREEN, SCREEN_HEIGHT } from "@constants/sizes";
 import VerticalCard from "@ui-components/cards/VerticalCard";
 import TextBoldL from "@ui-components/texts/TextBoldL";
-import { useSelector } from "react-redux";
-import { RootState } from "@store/store";
-import { useGetUserByIdQuery } from "@store/api/userApi";
-import { useAuth } from "@store/api/authApi";
+// ✅ Migration des imports
+import { useAuthStore } from "../../store/authStore";
+import { useUserById } from "@hooks/queries/useUser";
+import { useFavoritesStore } from "../../store/favoritesStore";
 import { useEffect } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback } from "react";
 
 type FavoritesProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, any>;
 };
 
 export default function Favorites({ navigation }: FavoritesProps) {
-  // Utilisation du hook useAuth pour une authentification plus fiable
-  const { user: authUser, isAuthenticated } = useAuth();
+  // ✅ Migration Redux → Zustand
+  const { user: authUser, isAuthenticated } = useAuthStore();
+  const { favoritesShoesIds, syncFavorites } = useFavoritesStore();
 
-  // Récupération du userId depuis le store Redux comme fallback
-  const { userId: reduxUserId } = useSelector((state: RootState) => state.auth);
+  const userId = authUser?.$id;
 
-  // Utiliser l'ID de l'utilisateur authentifié en priorité, sinon utiliser celui du Redux
-  const userId = authUser?.$id || reduxUserId;
-
+  // ✅ Migration Query Redux → Tanstack Query
   const {
     data: user,
     isLoading,
     refetch,
-  } = useGetUserByIdQuery(userId!, {
-    skip: !userId,
+  } = useUserById(userId!, {
+    enabled: !!userId,
   });
 
-  // Forcer le rafraîchissement des données lorsque l'écran est affiché
+  // ✅ Synchroniser les favoris entre Appwrite et Zustand
   useEffect(() => {
-    return navigation.addListener("focus", () => {
+    if (user?.favoriteIds) {
+      console.log("📋 Synchronisation favoris Appwrite → Zustand");
+      console.log("Favoris Appwrite:", user.favoriteIds);
+      console.log("Favoris Zustand:", favoritesShoesIds);
+
+      // Sync seulement si différents
+      if (
+        JSON.stringify(user.favoriteIds.sort()) !==
+        JSON.stringify(favoritesShoesIds.sort())
+      ) {
+        syncFavorites(user.favoriteIds);
+      }
+    }
+  }, [user?.favoriteIds, favoritesShoesIds, syncFavorites]);
+
+  // ✅ Rafraîchissement automatique lors du focus
+  useFocusEffect(
+    useCallback(() => {
       if (userId) {
-        console.log("Rafraîchissement des favoris...");
+        console.log("🔄 Rafraîchissement des favoris lors du focus...");
         refetch();
       }
-    });
-  }, [navigation, userId, refetch]);
+    }, [userId, refetch]),
+  );
 
-  // Mapper les IDs favoris vers les objets ShoeStock avec vérification supplémentaire
+  // ✅ Utiliser les favoris de Zustand pour un affichage optimiste
+  const activeFavoriteIds = user?.favoriteIds || favoritesShoesIds;
+
+  // Mapper les IDs favoris vers les objets ShoeStock
   const favoriteShoes =
-    user?.favoriteIds && user.favoriteIds.length > 0
-      ? (user.favoriteIds
+    activeFavoriteIds.length > 0
+      ? (activeFavoriteIds
           .map((id: string) => {
-            console.log("Recherche de l'article avec ID:", id);
+            console.log("🔍 Recherche de l'article avec ID:", id);
             const brand = shoes.find((item) =>
               item.stock.find((elem) => elem.id === id),
             );
-            return brand?.stock.find((el) => el.id === id);
+            const shoe = brand?.stock.find((el) => el.id === id);
+            if (!shoe) {
+              console.warn(`⚠️ Article non trouvé pour l'ID: ${id}`);
+            }
+            return shoe;
           })
           .filter(Boolean) as ShoeStock[])
       : [];
 
-  console.log("Nombre de favoris trouvés:", favoriteShoes?.length || 0);
+  console.log("📊 Statistiques favoris:");
+  console.log("- IDs favoris actifs:", activeFavoriteIds.length);
+  console.log("- Articles trouvés:", favoriteShoes.length);
+  console.log(
+    "- Articles favoris:",
+    favoriteShoes.map((s) => s.id),
+  );
 
   const navigateToDetails = (id: string) =>
     navigation.navigate("Details", { id });
@@ -83,26 +113,50 @@ export default function Favorites({ navigation }: FavoritesProps) {
     </View>
   );
 
+  // ✅ États de chargement et d'erreur améliorés
   if (isLoading) {
     return (
       <View style={styles.emptyListContainer}>
         <ActivityIndicator size="large" color={colors.DARK} />
+        <TextBoldL style={styles.loadingText}>
+          Chargement de vos favoris...
+        </TextBoldL>
       </View>
     );
   }
 
-  if (!userId) {
+  if (!isAuthenticated || !userId) {
     return (
       <View style={styles.emptyListContainer}>
-        <TextBoldL>Connectez-vous pour voir vos favoris</TextBoldL>
+        <TextBoldL style={styles.emptyText}>
+          Connectez-vous pour voir vos favoris
+        </TextBoldL>
       </View>
     );
   }
 
-  if (!user?.favoriteIds?.length) {
+  if (activeFavoriteIds.length === 0) {
     return (
       <View style={styles.emptyListContainer}>
-        <TextBoldL>Vous n'avez pas encore de favoris</TextBoldL>
+        <TextBoldL style={styles.emptyText}>
+          Vous n'avez pas encore de favoris
+        </TextBoldL>
+        <TextBoldL style={styles.emptySubText}>
+          Ajoutez des articles en appuyant sur ⭐
+        </TextBoldL>
+      </View>
+    );
+  }
+
+  if (favoriteShoes.length === 0 && activeFavoriteIds.length > 0) {
+    return (
+      <View style={styles.emptyListContainer}>
+        <TextBoldL style={styles.emptyText}>
+          Articles favoris introuvables
+        </TextBoldL>
+        <TextBoldL style={styles.emptySubText}>
+          Certains articles ont peut-être été supprimés
+        </TextBoldL>
       </View>
     );
   }
@@ -116,17 +170,26 @@ export default function Favorites({ navigation }: FavoritesProps) {
         numColumns={2}
         ItemSeparatorComponent={() => <ListItemSeparator height={spaces.L} />}
         contentContainerStyle={styles.contentStyle}
+        // ✅ Améliorer la performance
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        windowSize={10}
+        // ✅ Pull to refresh
+        refreshing={isLoading}
+        onRefresh={refetch}
       />
     </View>
   );
 }
 
+// ✅ Styles améliorés avec nouveaux états
 const styles = StyleSheet.create({
   emptyListContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: colors.LIGHT,
+    paddingHorizontal: spaces.L,
   },
   container: {
     height: SCREEN_HEIGHT,
@@ -142,5 +205,20 @@ const styles = StyleSheet.create({
     height: 240,
     justifyContent: "center",
     alignItems: "center",
+  },
+  loadingText: {
+    marginTop: spaces.M,
+    color: colors.GREY,
+    textAlign: "center",
+  },
+  emptyText: {
+    color: colors.DARK,
+    textAlign: "center",
+    marginBottom: spaces.S,
+  },
+  emptySubText: {
+    color: colors.GREY,
+    textAlign: "center",
+    fontSize: 14,
   },
 });

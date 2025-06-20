@@ -1,3 +1,4 @@
+import React from "react";
 import {
   createDrawerNavigator,
   DrawerContentComponentProps,
@@ -17,13 +18,11 @@ import ProfileIcon from "@assets/images/navigation/user.svg";
 import FavoriteIcon from "@assets/images/navigation/favorite.svg";
 import CartIcon from "@assets/images/navigation/cart.svg";
 import NotificationsIcon from "@assets/images/navigation/notifications.svg";
-import { useDispatch } from "react-redux";
-import { setToken } from "@store/slices/authSlice";
-import * as SecureStore from "expo-secure-store";
+import { useAuthStore } from "../store/authStore";
+import { useUserById } from "@hooks/queries/useUser";
+import { useLogout } from "@hooks/queries/useAuth";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useNotifications } from "@utils/notifications";
-import { useAuth, useLogoutMutation } from "@store/api/authApi";
-import { useProfileCreation } from "@hooks/useProfileCreation";
 
 type LabelProps = {
   shoesInCartCount: number | undefined;
@@ -58,12 +57,8 @@ export default function DrawerNavigator() {
         popToTopOnBlur: true,
         drawerStyle: {
           backgroundColor: colors.DARK,
-          width: "70%",
         },
-        overlayColor: "transparent",
-        sceneStyle: {
-          backgroundColor: colors.DARK,
-        },
+        overlayColor: colors.DARK,
         headerShown: false,
       }}
     >
@@ -93,40 +88,27 @@ const Label = ({ shoesInCartCount, label, activeIndex, index }: LabelProps) => {
 };
 
 function CustomDrawerContent(props: DrawerContentComponentProps) {
-  const dispatch = useDispatch();
-
-  const { user: authUser } = useAuth();
-  const { appwriteUserProfile } = useProfileCreation();
-
-  const [logoutMutation] = useLogoutMutation();
+  // ✅ Migration Redux → Zustand + Tanstack Query
+  const { user: authUser } = useAuthStore();
+  const { data: user } = useUserById(authUser?.$id!, {
+    enabled: !!authUser?.$id,
+  });
+  const logoutMutation = useLogout();
 
   const activeIndex = props.state.routes[0].state?.index || 0;
-  const shoesInCartCount = appwriteUserProfile?.cart?.shoes?.length;
+  const shoesInCartCount = user?.cart?.shoes?.length;
 
-  const logout = async () => {
-    try {
-      // Utiliser la mutation d'Appwrite pour se déconnecter
-      await logoutMutation().unwrap();
-
-      // Nettoyer le state Redux
-      dispatch(setToken(undefined));
-
-      // Supprimer le token de refresh stocké
-      await SecureStore.deleteItemAsync("refreshToken");
-
-      console.log("Déconnexion réussie");
-    } catch (error) {
-      console.error("Erreur lors de la déconnexion:", error);
-    }
+  const logout = () => {
+    logoutMutation.mutate();
   };
 
   return (
     <DrawerContentScrollView>
       <View style={styles.userInfosContainer}>
         <View style={styles.imageContainer}>
-          {appwriteUserProfile?.photoUrl ? (
+          {user?.photoUrl ? (
             <Image
-              source={{ uri: appwriteUserProfile.photoUrl }}
+              source={{ uri: user.photoUrl }}
               style={styles.image}
               resizeMode="cover"
             />
@@ -134,9 +116,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
             <FontAwesome name="user-circle" size={90} color={colors.BLUE} />
           )}
         </View>
-        <TextBoldXL style={styles.text}>
-          {appwriteUserProfile?.fullName}
-        </TextBoldXL>
+        <TextBoldXL style={styles.text}>{user?.fullName}</TextBoldXL>
       </View>
       {routes.map((route) => (
         <DrawerItem
@@ -192,6 +172,7 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
   );
 }
 
+// ✅ Styles originaux préservés
 const styles = StyleSheet.create({
   userInfosContainer: {
     marginLeft: spaces.L,

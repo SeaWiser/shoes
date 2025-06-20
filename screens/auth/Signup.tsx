@@ -1,20 +1,26 @@
-import AuthForm from "@screens/auth/components/AuthForm";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "@models/navigation";
-import { useSignUpMutation } from "@store/api/authApi";
-import { AuthFormValues } from "@models/auth";
+import React from "react";
 import { Alert } from "react-native";
 import { FormikHelpers } from "formik";
-import { useProfileCreation } from "@hooks/useProfileCreation";
-import { account } from "../../appwrite";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import AuthForm from "@screens/auth/components/AuthForm";
+import { RootStackParamList } from "@models/navigation";
+import { useSignUp } from "@hooks/queries/useAuth";
+import { useCreateUserProfile } from "@hooks/queries/useUser";
+import { SignupRequest } from "@services/authService";
 
 type SignupProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Signup">;
 };
 
+type AuthFormValues = {
+  email: string;
+  password: string;
+  confirmPassword?: string;
+};
+
 export default function Signup({ navigation }: SignupProps) {
-  const [signUp, { isLoading, error }] = useSignUpMutation();
-  const { createUserProfileExplicitly } = useProfileCreation();
+  const signUpMutation = useSignUp();
+  const createUserProfileMutation = useCreateUserProfile();
 
   const navigateToLogin = () => {
     navigation.replace("Login");
@@ -25,25 +31,22 @@ export default function Signup({ navigation }: SignupProps) {
     formikHelpers: FormikHelpers<AuthFormValues>,
   ) => {
     try {
-      // 1. Création du compte d'authentification
-      const response = await signUp({
+      // 1. Créer le compte d'authentification
+      const response = await signUpMutation.mutateAsync({
         email: values.email,
         password: values.password,
-      }).unwrap();
+      });
 
       console.log("✅ Inscription réussie:", response.user.email);
 
-      // 2. Création du profil utilisateur dans la collection
+      // 2. Créer le profil utilisateur dans la collection
       try {
-        // Utiliser la fonction centralisée du hook
-        await createUserProfileExplicitly(
-          response.user.$id,
-          response.user.email,
-          response.user.name,
-        );
+        await createUserProfileMutation.mutateAsync({
+          userId: response.user.$id,
+          email: response.user.email,
+          fullName: response.user.name || "",
+        });
 
-        // Ne pas naviguer - laisser la redirection automatique
-        // via la logique conditionnelle du MainStackNavigator
         Alert.alert(
           "Inscription réussie",
           "Votre compte a été créé avec succès.",
@@ -52,16 +55,15 @@ export default function Signup({ navigation }: SignupProps) {
       } catch (profileError: any) {
         console.error("❌ Erreur création profil:", profileError);
         Alert.alert(
-          "Erreur de création de profil",
-          "Votre compte a été créé mais nous n'avons pas pu initialiser votre profil. Veuillez vous connecter pour compléter votre profil.",
+          "Erreur",
+          "Le compte a été créé mais une erreur est survenue lors de la configuration du profil.",
+          [{ text: "OK" }],
         );
-        // Déconnexion pour revenir à l'écran de login
-        await account.deleteSession("current");
       }
     } catch (error: any) {
       console.error("❌ Erreur inscription:", error);
 
-      if (error.status === 409) {
+      if (error.message.includes("account already exists")) {
         Alert.alert(
           "Compte existant",
           "Un compte existe déjà avec cet email. Voulez-vous vous connecter ?",
@@ -70,13 +72,8 @@ export default function Signup({ navigation }: SignupProps) {
             { text: "Se connecter", onPress: navigateToLogin },
           ],
         );
-      } else {
-        Alert.alert(
-          "Erreur d'inscription",
-          error.data || "Une erreur est survenue lors de l'inscription",
-        );
       }
-
+    } finally {
       formikHelpers.setSubmitting(false);
     }
   };
@@ -85,8 +82,13 @@ export default function Signup({ navigation }: SignupProps) {
     <AuthForm
       navigate={navigateToLogin}
       submitFormHandler={submitFormHandler}
-      isLoading={isLoading}
-      error={error}
+      isLoading={
+        signUpMutation.isPending || createUserProfileMutation.isPending
+      }
+      error={
+        signUpMutation.error?.message ||
+        createUserProfileMutation.error?.message
+      }
     />
   );
 }

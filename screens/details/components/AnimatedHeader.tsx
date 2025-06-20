@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import CartIcon from "@assets/images/navigation/cart.svg";
-import { ICON_SIZE, SMALL_ICON_SIZE } from "@constants/sizes";
+import { ICON_SIZE, SCREEN_WIDTH, SMALL_ICON_SIZE } from "@constants/sizes";
 import { colors } from "@constants/colors";
 import TextBoldM from "@ui-components/texts/TextBoldM";
 import { radius } from "@constants/radius";
@@ -31,11 +31,11 @@ export default function AnimatedHeader({
 }: AnimatedHeaderProps) {
   const navigation = useNavigation();
   const [count, setCount] = useState(cartCount);
-  const animatedTranslate = useSharedValue(spaces.M + MAIN_WIDTH);
+  const animatedTranslate = useSharedValue(SCREEN_WIDTH);
   const animatedScale = useSharedValue(1);
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: animatedTranslate.value }],
+    transform: [{ translateX: animatedTranslate.value + 4 }],
   }));
 
   const animatedBadgeStyle = useAnimatedStyle(() => ({
@@ -51,11 +51,15 @@ export default function AnimatedHeader({
       animatedTranslate.value = withTiming(spaces.M, { duration: 2000 }, () => {
         runOnJS(setCount)(cartCount);
         animatedScale.value = withRepeat(withSpring(1.5), 2, true, () => {
-          animatedTranslate.value = withTiming(spaces.M + MAIN_WIDTH, {
-            duration: 2000,
-          }, () => {
-            runOnJS(setShouldAnimate)(false);
-          });
+          animatedTranslate.value = withTiming(
+            spaces.M + MAIN_WIDTH + 20,
+            {
+              duration: 2000,
+            },
+            () => {
+              runOnJS(setShouldAnimate)(false);
+            },
+          );
         });
       });
     }
@@ -86,6 +90,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: radius.REGULAR,
     borderBottomLeftRadius: radius.REGULAR,
     backgroundColor: colors.BLUE,
+    overflow: "hidden",
   },
   badge: {
     width: SMALL_ICON_SIZE,

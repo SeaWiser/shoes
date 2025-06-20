@@ -1,68 +1,41 @@
-import { Alert } from "react-native";
-import AuthForm from "@screens/auth/components/AuthForm";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "@models/navigation";
-import { useEffect } from "react";
-import { useSignInMutation } from "@store/api/authApi";
-import { FormikHelpers } from "formik";
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import AuthForm from "./components/AuthForm";
+import { useSignIn } from "@hooks/queries/useAuth";
+import { LoginRequest } from "@services/authService";
 
 type LoginProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, "Login">;
-};
-
-type AuthFormValues = {
-  email: string;
-  password: string;
-  confirmPassword?: string;
+  navigation: any; // ou le type approprié
 };
 
 export default function Login({ navigation }: LoginProps) {
-  const [signIn, { data, isLoading, error }] = useSignInMutation();
+  const signInMutation = useSignIn();
 
-  const navigateToSignup = () => {
-    navigation.replace("Signup");
+  const submitFormHandler = (values: LoginRequest) => {
+    signInMutation.mutate(values);
   };
 
-  const submitFormHandler = async (
-    values: AuthFormValues,
-    formikHelpers: FormikHelpers<AuthFormValues>,
-  ) => {
-    try {
-      await signIn({
-        email: values.email,
-        password: values.password,
-      }).unwrap();
-    } catch (error: any) {
-      console.error("Erreur de connexion:", error);
-
-      Alert.alert(
-        "Erreur de connexion",
-        error?.data || "Une erreur est survenue lors de la connexion",
-      );
-
-      formikHelpers.setSubmitting(false);
-    }
+  const navigate = () => {
+    navigation.navigate("Signup");
   };
-
-  useEffect(() => {
-    if (data?.user) {
-      console.log("✅ Connexion réussie:", data.user.email);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    if (error) {
-      console.error("❌ Erreur auth:", error);
-    }
-  }, [error]);
 
   return (
-    <AuthForm
-      loginScreen
-      navigate={navigateToSignup}
-      submitFormHandler={submitFormHandler}
-      isLoading={isLoading}
-      error={error}
-    />
+    <View style={styles.container}>
+      <AuthForm
+        loginScreen={true}
+        navigate={navigate}
+        submitFormHandler={submitFormHandler}
+        isLoading={signInMutation.isPending}
+        error={signInMutation.error?.message}
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 20,
+  },
+});

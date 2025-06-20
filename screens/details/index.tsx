@@ -6,6 +6,7 @@ import {
   Alert,
   ActivityIndicator,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; // ✅ Import SafeAreaView
 import { shoes } from "@data/shoes";
 import DetailsDescription from "@screens/details/components/DetailsDescription";
 import DetailsImage from "@screens/details/components/DetailsImage";
@@ -14,19 +15,18 @@ import Sizes from "@screens/details/components/Sizes";
 import { ShoeSize } from "@models/shoe-size";
 import CustomButton from "@ui-components/buttons/CustomButton";
 import { spaces } from "@constants/spaces";
-import { SCREEN_HEIGHT } from "@constants/sizes";
 import { useEffect, useState } from "react";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "@models/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import {
-  useGetUserByUserIdQuery,
-  useUpdateUserProfileMutation,
-} from "@store/api/userApi";
-import { useAuth } from "@store/api/authApi";
+import { useAuthStore } from "../../store/authStore";
+import { useUserById, useUpdateUserProfile } from "@hooks/queries/useUser";
+import { useCartStore } from "../../store/cartStore";
+import { CartShoe } from "@models/cart";
 import AnimatedHeader from "@screens/details/components/AnimatedHeader";
 import * as Haptics from "expo-haptics";
 import { colors } from "@constants/colors";
+import { convertImageToString } from "@utils/imageConverter";
 
 type DetailsProps = {
   route: RouteProp<RootStackParamList, "Details">;
@@ -36,32 +36,19 @@ type DetailsProps = {
 export default function Details({ route, navigation }: DetailsProps) {
   const [shouldAnimate, setShouldAnimate] = useState<boolean>(false);
 
-  // Utiliser le hook d'authentification Appwrite
-  const { user: authUser, isAuthenticated, isLoading: authLoading } = useAuth();
-
-  // IMPORTANT: Utiliser l'ID de l'utilisateur authentifié pour la requête
-  const userId = authUser?.$id;
-
-  console.log("=== AUTH DEBUG ===");
-  console.log("Auth user ID:", userId);
-  console.log("Is authenticated:", isAuthenticated);
-
-  // Récupérer le profil utilisateur avec l'userId (qui est l'ID d'auth)
+  const { user: authUser, isAuthenticated } = useAuthStore();
   const {
     data: userProfile,
     refetch,
     isLoading: userLoading,
-    error: userError,
-  } = useGetUserByUserIdQuery(userId!, {
-    skip: !userId,
-  });
+  } = useUserById(authUser?.$id!, { enabled: !!authUser?.$id });
+  const updateUserMutation = useUpdateUserProfile();
+  const { addShoe, syncCart, shoes: cartShoes } = useCartStore();
 
-  const [updateUser, { isLoading: isUpdating }] =
-    useUpdateUserProfileMutation();
+  const [animatedCartCount, setAnimatedCartCount] = useState(cartShoes.length);
 
-  console.log("=== USER PROFILE DEBUG ===");
-  console.log("User profile:", userProfile);
-  console.log("User profile $id:", userProfile?.$id);
+  const userId = authUser?.$id;
+  const isUpdating = updateUserMutation.isPending;
 
   const data = shoes
     .find((el) => el.stock.find((item) => item.id === route.params.id))!
@@ -78,9 +65,6 @@ export default function Details({ route, navigation }: DetailsProps) {
 
   const addToCart = async () => {
     console.log("=== DEBUT addToCart ===");
-    console.log("Is authenticated:", isAuthenticated);
-    console.log("User profile:", userProfile);
-    console.log("Selected size:", selectedSize);
 
     // Vérifications
     if (!isAuthenticated || !userId) {
@@ -119,17 +103,20 @@ export default function Details({ route, navigation }: DetailsProps) {
     }
 
     try {
-      // Haptic feedback
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      setAnimatedCartCount(cartShoes.length + 1);
       setShouldAnimate(true);
 
-      const newItem = {
+      // Haptic feedback
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+      // Créer l'article avec conversion d'image
+      const newItem: CartShoe = {
         id: `${data.id}_${Date.now()}`,
         name:
           (brand ? brand.charAt(0).toUpperCase() + brand.slice(1) : "") +
           " " +
           data.name,
-        image: selectedImage,
+        image: convertImageToString(selectedImage),
         size: selectedSize,
         price: data.price,
         quantity: 1,
@@ -137,40 +124,29 @@ export default function Details({ route, navigation }: DetailsProps) {
 
       console.log("Nouvel article:", newItem);
 
-      // Créer le nouveau panier
-      const existingShoes = userProfile.cart?.shoes || [];
-      const newShoes = [...existingShoes, newItem];
-      const newTotalAmount =
-        (userProfile.cart?.totalAmount || 0) + newItem.price;
+      // Ajouter à Zustand store en PREMIER (pour l'animation immédiate)
+      addShoe(newItem);
+
+      // Créer le nouveau panier pour Appwrite en utilisant les données Zustand mises à jour
+      const updatedCartShoes = [...cartShoes, newItem];
+      const newTotalAmount = updatedCartShoes.reduce(
+        (total, shoe) => total + shoe.price * shoe.quantity,
+        0,
+      );
 
       const cartData = {
-        shoes: newShoes,
+        shoes: updatedCartShoes,
         totalAmount: newTotalAmount,
       };
 
-      console.log("Nouveau panier:", {
-        itemsCount: newShoes.length,
-        totalAmount: newTotalAmount,
-      });
-
-      // IMPORTANT: Utiliser le $id du document utilisateur, pas l'ID d'auth
-      const updatePayload = {
-        documentId: userProfile.$id, // ID du document dans la collection users
-        userId: userProfile.userId, // ID de l'utilisateur (pour la validation)
+      // Mise à jour via Tanstack Query (en arrière-plan)
+      await updateUserMutation.mutateAsync({
+        documentId: userProfile.$id,
+        userId: userProfile.userId,
         cart: cartData,
-      };
-
-      console.log("Payload de mise à jour:", {
-        documentId: updatePayload.documentId,
-        userId: updatePayload.userId,
-        cartItemsCount: cartData.shoes.length,
       });
 
-      const result = await updateUser(updatePayload).unwrap();
-      console.log("Mise à jour réussie");
-
-      // Rafraîchir les données
-      await refetch();
+      console.log("✅ Article ajouté au panier");
 
       // Feedback visuel
       Alert.alert(
@@ -181,6 +157,11 @@ export default function Details({ route, navigation }: DetailsProps) {
     } catch (error) {
       console.error("=== ERREUR LORS DE L'AJOUT ===");
       console.error("Error:", error);
+
+      // Rollback en cas d'erreur - resynchroniser avec les données serveur
+      if (userProfile?.cart) {
+        syncCart(userProfile.cart);
+      }
 
       Alert.alert(
         "Erreur",
@@ -203,22 +184,38 @@ export default function Details({ route, navigation }: DetailsProps) {
     });
   }, [route.params.id]);
 
-  // Afficher un loader pendant le chargement
-  if (authLoading || userLoading) {
+  useEffect(() => {
+    if (userProfile?.cart && cartShoes.length === 0) {
+      console.log("🔄 Synchronisation initiale du panier dans Details");
+      syncCart(userProfile.cart);
+    }
+  }, [userProfile?.cart, syncCart, cartShoes.length]);
+
+  useEffect(() => {
+    setAnimatedCartCount(cartShoes.length);
+  }, [cartShoes.length]);
+
+  if (userLoading) {
     return (
-      <View style={styles.activityIndicatorContainer}>
+      <SafeAreaView
+        style={styles.activityIndicatorContainer}
+        edges={["top", "bottom"]}
+      >
         <ActivityIndicator size="large" color={colors.DARK} />
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.mainContainer}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={styles.mainContainer} edges={["bottom"]}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollViewContent}
+      >
         <AnimatedHeader
           shouldAnimate={shouldAnimate}
           setShouldAnimate={setShouldAnimate}
-          cartCount={userProfile?.cart?.shoes?.length ?? 0}
+          cartCount={animatedCartCount}
         />
         <View style={styles.container}>
           <DetailsImage source={selectedImage} />
@@ -254,7 +251,7 @@ export default function Details({ route, navigation }: DetailsProps) {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -266,11 +263,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   mainContainer: {
-    height: SCREEN_HEIGHT,
+    flex: 1,
+    backgroundColor: colors.LIGHT,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    paddingBottom: spaces.XL,
   },
   container: {
-    position: "relative",
-    bottom: Platform.select({ android: 80, ios: 100 }),
+    flex: 1,
   },
   centerContent: {
     justifyContent: "center",

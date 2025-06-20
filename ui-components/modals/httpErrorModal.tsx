@@ -1,12 +1,8 @@
-import { View, StyleSheet, Modal } from "react-native";
-import TextBoldL from "@ui-components/texts/TextBoldL";
-import CustomButton from "@ui-components/buttons/CustomButton";
-import { SCREEN_HEIGHT } from "@constants/sizes";
+import React from "react";
+import { Modal, View, Text, StyleSheet, Pressable } from "react-native";
+import { useErrorStore } from "../../store/errorStore";
 import { colors } from "@constants/colors";
-import { radius } from "@constants/radius";
 import { spaces } from "@constants/spaces";
-import { useSelector } from "react-redux";
-import { RootState } from "@store/store";
 
 interface HttpErrorModalProps {
   isModalVisible: boolean;
@@ -17,35 +13,69 @@ export default function HttpErrorModal({
   isModalVisible,
   closeModal,
 }: HttpErrorModalProps) {
-  const errorMessage = useSelector(
-    (state: RootState) => state.error.httpErrorMessage,
-  );
+  const { httpErrorMessage } = useErrorStore();
+
+  const handleClose = () => {
+    closeModal();
+  };
 
   return (
-    <Modal visible={isModalVisible} animationType="slide" transparent>
-      <View style={styles.container}>
-        <TextBoldL style={styles.text}>{errorMessage}</TextBoldL>
-        <CustomButton text="OK" onPress={closeModal} />
+    <Modal
+      visible={isModalVisible}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={handleClose}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.modal}>
+          <Text style={styles.title}>Erreur</Text>
+          <Text style={styles.message}>
+            {httpErrorMessage || "Une erreur est survenue"}
+          </Text>
+          <Pressable style={styles.button} onPress={handleClose}>
+            <Text style={styles.buttonText}>OK</Text>
+          </Pressable>
+        </View>
       </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    minHeight: SCREEN_HEIGHT / 2.5,
-    backgroundColor: colors.GREY,
-    borderTopLeftRadius: radius.REGULAR,
-    borderTopRightRadius: radius.REGULAR,
-    padding: spaces.L,
-    justifyContent: "space-evenly",
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
     alignItems: "center",
   },
-  text: {
+  modal: {
+    backgroundColor: colors.LIGHT,
+    borderRadius: 10,
+    padding: spaces.L,
+    margin: spaces.L,
+    minWidth: 280,
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: spaces.M,
+    color: colors.DARK,
+  },
+  message: {
+    fontSize: 16,
     textAlign: "center",
+    marginBottom: spaces.L,
+    color: colors.DARK,
+  },
+  button: {
+    backgroundColor: colors.BLUE,
+    paddingHorizontal: spaces.L,
+    paddingVertical: spaces.M,
+    borderRadius: 8,
+  },
+  buttonText: {
     color: colors.LIGHT,
+    fontWeight: "bold",
   },
 });

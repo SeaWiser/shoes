@@ -19,6 +19,7 @@ module.exports = function (api) {
             "@utils/*": "./utils",
             "@lib/*": "./lib",
             "@store/*": "./store",
+            "@services/*": "./services",
           },
         },
       ],

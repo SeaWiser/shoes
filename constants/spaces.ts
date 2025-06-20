@@ -4,4 +4,5 @@ export const spaces = {
   M: 16,
   L: 24,
   XL: 32,
+  XXL: 48,
 };

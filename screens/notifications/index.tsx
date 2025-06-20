@@ -7,9 +7,7 @@ import ListItem from "@screens/notifications/components/ListItem";
 import { ShoeStock } from "@models/shoe";
 import { MainStackParamList } from "@models/navigation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useAuth } from "@store/api/authApi";
-import { useProfileCreation } from "@hooks/useProfileCreation";
-import { useUpdateUserProfileMutation } from "@store/api/userApi";
+import { useNotificationManager } from "@hooks/useNotificationManager";
 
 const ids = ["nik64p", "adi7p", "adi203p"];
 
@@ -18,10 +16,8 @@ type NotificationsProps = {
 };
 
 export default function Notifications({ navigation }: NotificationsProps) {
-  const { user: authUser } = useAuth();
-  const { userProfile, appwriteUserProfile, isLoadingProfile } =
-    useProfileCreation();
-  const [updateUserProfile] = useUpdateUserProfileMutation();
+  const { markAsSeen, isNotificationSeen, isLoading } =
+    useNotificationManager();
 
   const data = ids
     .map((id) =>
@@ -35,40 +31,19 @@ export default function Notifications({ navigation }: NotificationsProps) {
     navigation.navigate("Details", { id });
 
   const updateNotif = (id: string) => {
-    if (!appwriteUserProfile || !authUser) return;
-
-    const currentSeenNotifs = appwriteUserProfile.seenNotifsIds || [];
-
-    // Check that the notification is not already marked as seen.
-    if (currentSeenNotifs.includes(id)) return;
-
-    const newSeenNotifs = [...currentSeenNotifs, id];
-
-    updateUserProfile({
-      documentId: appwriteUserProfile.$id,
-      userId: authUser.$id,
-      seenNotifsIds: newSeenNotifs,
-    });
+    markAsSeen(id);
   };
 
   const renderItem = ({ item }: { item: ShoeStock }) => (
     <ListItem
       item={item}
       navigateToDetails={navigateToDetails}
-      isSeen={appwriteUserProfile?.seenNotifsIds?.includes(item.id)}
+      isSeen={isNotificationSeen(item.id)}
       updateNotif={updateNotif}
     />
   );
 
-  if (isLoadingProfile || !authUser) {
-    return (
-      <View style={styles.emptyListContainer}>
-        <ActivityIndicator size="large" color={colors.DARK} />
-      </View>
-    );
-  }
-
-  if (!userProfile || !appwriteUserProfile) {
+  if (isLoading) {
     return (
       <View style={styles.emptyListContainer}>
         <ActivityIndicator size="large" color={colors.DARK} />
@@ -88,15 +63,15 @@ export default function Notifications({ navigation }: NotificationsProps) {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.LIGHT,
+    paddingHorizontal: spaces.L,
+    paddingTop: spaces.L,
+  },
   emptyListContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors.LIGHT,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.LIGHT,
-    paddingTop: spaces.L,
   },
 });

@@ -1,13 +1,13 @@
 import { StyleSheet, ScrollView, KeyboardAvoidingView } from "react-native";
 import * as Yup from "yup";
 import { Formik } from "formik";
-import { UserFormValues, ProfileFormUser } from "@models/user";
+import { UserFormValues } from "@models/user";
 import { spaces } from "@constants/spaces";
 import { colors } from "@constants/colors";
 import Input from "@ui-components/inputs/Input";
 import CustomButton from "@ui-components/buttons/CustomButton";
 import ProfilePicture from "@screens/profile/components/ProfilePicture";
-import { ProfileImage } from "@models/profile";
+import { ProfileFormUser, ProfileImage } from "@models/profile";
 
 type ProfileFormProps = {
   user: ProfileFormUser;
